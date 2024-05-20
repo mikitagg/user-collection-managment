@@ -13,7 +13,6 @@ class TagTransformator implements DataTransformerInterface
 
 
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
         private readonly ItemTagRepository      $itemTagRepository,
     )
     {

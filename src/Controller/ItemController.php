@@ -58,7 +58,7 @@ class ItemController extends AbstractController
         }
 
         return $this->render('item/form.html.twig', [
-            'item_form' => $form,
+            'item_form' => $form->createView(),
             'item_name' => $itemCollectionName,
         ]);
     }
