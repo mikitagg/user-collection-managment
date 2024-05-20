@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block body %}
+    <h2>{{ item_name }}</h2>
+
+    {{ form_start(item_form) }}
+    {{ form_errors(item_form) }}
+
+    {{ form_row(item_form.name) }}
+
+
+    {% for field in item_form %}
+        {% if (field.vars.name != 'name' and field.vars.name!= 'itemTags') %}
+            {{ form_row(field) }}
+        {% endif %}
+    {% endfor %}
+
+    <div id="tag-wrapper" class="tags"
+        data-index="{{ item_form.itemTags|length > 0 ? item_form.itemTags|last.vars.name + 1 : 0 }}"
+        data-prototype="{{ form_widget(item_form.itemTags.vars.prototype)|e('html_attr') }}"
+    >
+        {% for tags in item_form.itemTags %}
+            <div class="tag">
+                {{ form_row(tags) }}
+            </div>
+        {% endfor %}
+    </div>
+    <a id="add-tag" href="#">Add Tag</a>
+
+    <button type="submit">Submit</button>
+
+    {{ form_end(item_form) }}
+
+    <script type="application/javascript" src="{{ asset('js/tags-form-helper.js') }}"></script>
+
+{% endblock %}
