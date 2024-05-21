@@ -8,12 +8,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 
-class TagTransformator implements DataTransformerInterface
+readonly class TagTransformer implements DataTransformerInterface
 {
 
-
     public function __construct(
-        private readonly ItemTagRepository      $itemTagRepository,
+        private ItemTagRepository $itemTagRepository,
     )
     {
     }
@@ -26,7 +25,7 @@ class TagTransformator implements DataTransformerInterface
 
         $tags = [];
 
-        foreach ($value->getTags() as $tag) {
+        foreach ($value as $tag) {
             $tags[] = $tag->getName();
         }
 
@@ -56,4 +55,5 @@ class TagTransformator implements DataTransformerInterface
 
         return $value;
     }
+
 }

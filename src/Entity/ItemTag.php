@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\Index(name: 'item_idx', columns: ['name'], flags: ['fulltext'])]
 #[ORM\Entity(repositoryClass: ItemTagRepository::class)]
 class ItemTag
 {

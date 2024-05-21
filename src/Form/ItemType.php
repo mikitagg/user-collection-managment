@@ -23,6 +23,7 @@ class ItemType extends AbstractType
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
+        private readonly TagTransformer $tagTransformer,
     )
     {
 
@@ -41,6 +42,7 @@ class ItemType extends AbstractType
                  ],
                  'autocomplete_url' => '/autocomplete/tags',
              ]);
+        $builder->get('itemTags')->addModelTransformer($this->tagTransformer);
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) {
@@ -102,6 +104,7 @@ class ItemType extends AbstractType
                 $itemCollectionRepository = $this->entityManager->getRepository(ItemsCollection::class);
                 $customAttributes = $itemCollectionRepository->findWithCustomAttributes($data->getItemCollection()->getId());
                 $i = 0;
+              //  $form->getConfig()->get
                 foreach ($form as $field) {
                     if ($field->getConfig()->getOption('mapped') === false) {
                         $attributeValue = new ItemAttributeValue();
