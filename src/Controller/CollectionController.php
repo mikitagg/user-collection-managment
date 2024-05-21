@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\ItemsCollection;
 use App\Form\CollectionType;
+use App\Repository\ItemsCollectionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -80,8 +81,38 @@ class CollectionController extends AbstractController
         ]);
     }
 
+    #[Route('/collection/user', name: 'app_collection_user', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function show(Request $request, ItemsCollectionRepository $itemsCollectionRepository): Response
+    {
+        $user = $this->getUser();
+        $collection = [];
+        $itemCollection = $itemsCollectionRepository->findByUser($user->getId());
+
+        foreach ($itemCollection as $itemsCollection) {
+            $collectionValues['id'] = $itemsCollection->getId();
+            $collectionValues['name'] = $itemsCollection->getName();
+            $collectionValues['description'] = $itemsCollection->getDescription();
+            $attributes = $itemsCollection->getCustomItemAttributes();
+            $customAttribute = [];
+
+            foreach ($attributes as $attribute) {
+                $customAttribute[] = $attribute->getName();
+            }
+            $collectionValues['attributes'] = $customAttribute;
+
+            $collection[] = $collectionValues;
+
+        }
+
+        return $this->render('collection/table.html.twig', [
+            'action' => 'create',
+            'collection' => $collection,
+        ]);
+    }
+
+
     #[Route('/collection/show', name: 'app_collection_show', methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    public function show(Request $request): Response
+    public function userCollection(Request $request): Response
     {
         $user = $this->getUser();
 
@@ -90,26 +121,15 @@ class CollectionController extends AbstractController
         $itemCollectionRepository = $this->entityManager->getRepository(ItemsCollection::class);
         $itemCollection = $itemCollectionRepository->findByUser($user->getId());
 
-
-
-      //  $collectionsName = $itemsCollection->getName();
         foreach ($itemCollection as $itemsCollection) {
             $collection['name'] = $itemsCollection->getName();
             $collection['id'] = $itemsCollection->getId();
-       //     $collection['description'] = $itemsCollection->getDescription();
-//            foreach ($itemsCollection->getCustomItemAttributes() as $itemsCollectionItem) {
-//                 $attributeValues[] = $itemsCollectionItem->getName();
-//            }
             $attributeValues[] = $collection;
-
         }
-//        dd($attributeValues);
 
         return $this->render('collection/show.html.twig', [
             'action' => 'create',
-         //   'collection' => $collection,
             'attributeValues' => $attributeValues,
         ]);
-
     }
 }

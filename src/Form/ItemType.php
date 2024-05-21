@@ -8,7 +8,6 @@ use App\Entity\ItemsCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType as BaseCollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -104,7 +103,6 @@ class ItemType extends AbstractType
                 $itemCollectionRepository = $this->entityManager->getRepository(ItemsCollection::class);
                 $customAttributes = $itemCollectionRepository->findWithCustomAttributes($data->getItemCollection()->getId());
                 $i = 0;
-              //  $form->getConfig()->get
                 foreach ($form as $field) {
                     if ($field->getConfig()->getOption('mapped') === false) {
                         $attributeValue = new ItemAttributeValue();
