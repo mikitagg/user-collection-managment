@@ -18,7 +18,7 @@ function addCollectionAttribute() {
     addRemoveAttributeButton(tag);
 }
 
-function addRemoveAttributeButton(item) {
+function addRemoveAttributeButton(tag) {
     const removeFormButton = document.createElement('a');
     removeFormButton.href = '#'
     removeFormButton.innerText = 'Delete tag';

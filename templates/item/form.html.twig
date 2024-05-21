@@ -3,36 +3,63 @@
 {% block title %}Welcome{% endblock %}
 
 {% block body %}
-    <h2>{{ item_name }}</h2>
+    <div class="container">
+        <h2>{{ item_name }}</h2>
 
-    {{ form_start(item_form) }}
-    {{ form_errors(item_form) }}
+        {{ form_start(item_form) }}
+        {{ form_errors(item_form) }}
 
-    {{ form_row(item_form.name) }}
+        <div class="mb-3">
+            {{ form_row(item_form.name) }}
+        </div>
 
 
-    {% for field in item_form %}
-        {% if (field.vars.name != 'name' and field.vars.name!= 'itemTags') %}
-            {{ form_row(field) }}
-        {% endif %}
-    {% endfor %}
+        <div class="mb-3">
+        <div id="customItemAttributeValues">
+            {% for field in item_form %}
+                {% if (field.vars.name != 'name' and field.vars.name!= 'itemTags') %}
+                    {{ form_row(field) }}
+                {% endif %}
+            {% endfor %}
+        </div>
+        </div>
 
-    <div id="tag-wrapper" class="tags"
-        data-index="{{ item_form.itemTags|length > 0 ? item_form.itemTags|last.vars.name + 1 : 0 }}"
-        data-prototype="{{ form_widget(item_form.itemTags.vars.prototype)|e('html_attr') }}"
-    >
-        {% for tags in item_form.itemTags %}
-            <div class="tag">
-                {{ form_row(tags) }}
-            </div>
-        {% endfor %}
+        <div class="mb-3">
+            {{ form_label(item_form.itemTags) }}
+            {{ form_widget(item_form.itemTags, {'attr': {'class': 'form-control', 'id': 'tagsInput'}}) }}
+
+
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+
+{#            <script>#}
+{#                $(document).ready(function() {#}
+{#                    // Initialize Tom Select on the element with the ID 'tagsInput'#}
+{#                    $('#item_itemTags').tomSelect({#}
+{#                        create: true,#}
+{#                        createOnBlur: true,#}
+{#                        delimiter: ',',#}
+{#                        ajax: {#}
+{#                            url: '/autocomplete/tags',#}
+{#                            type: 'GET',#}
+{#                            cache: false,#}
+{#                            dataType: 'json',#}
+{#                            data: function(term) {#}
+{#                                return { query: term };#}
+{#                            },#}
+{#                            processResults: function(data) {#}
+{#                                return {#}
+{#                                    results: data#}
+{#                                }#}
+{#                            }#}
+{#                        }#}
+{#                    });#}
+{#                });#}
+{#            </script>#}
+        </div>
+
+
+        <button type="submit">Submit</button>
+        {{ form_end(item_form) }}
     </div>
-    <a id="add-tag" href="#">Add Tag</a>
-
-    <button type="submit">Submit</button>
-
-    {{ form_end(item_form) }}
-
-    <script type="application/javascript" src="{{ asset('js/tags-form-helper.js') }}"></script>
-
 {% endblock %}

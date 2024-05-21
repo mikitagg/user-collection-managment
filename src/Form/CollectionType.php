@@ -6,6 +6,7 @@ use App\Entity\CollectionCategory;
 use App\Entity\ItemsCollection;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -34,11 +35,6 @@ class CollectionType extends AbstractType
                 ]
             )
         ;
-//        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
-//            $collection = $event->getData();
-//            $collection->setUser();
-//
-//        });
     }
 
     public function configureOptions(OptionsResolver $resolver): void

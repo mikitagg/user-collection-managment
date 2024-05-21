@@ -2,12 +2,13 @@
 
 namespace App\Form;
 
-use App\Entity\ItemAttributeValue;
 use App\Entity\ItemTag;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\UX\Autocomplete\Form\AsEntityAutocompleteField;
 
+#[AsEntityAutocompleteField]
 class TagType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -7,11 +7,14 @@ use App\Entity\Item;
 
 use App\Entity\ItemAttributeValue;
 use App\Entity\ItemsCollection;
+use App\Entity\ItemTag;
 use App\Form\CollectionType;
 use App\Form\ItemAttributeValueType;
 use App\Form\ItemType;
+use App\Repository\ItemTagRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -36,17 +39,20 @@ class ItemController extends AbstractController
     }
 
     #[Route('/item/create', name: 'item_create')]
-    public function create(Request $request, EntityManagerInterface $entityManager): Response
+    public function create(Request $request, EntityManagerInterface $entityManager, ItemTagRepository $itemTagRepository): Response
     {
         $item = new Item();
         $this->denyAccessUnlessGranted('ROLE_USER');
-
+        $itemTag = $itemTagRepository->findAll();
         $itemCollectionRepository = $entityManager->getRepository(ItemsCollection::class);
         $itemCollection = $itemCollectionRepository->find(19);
         $itemCollectionName = $itemCollection->getName();
         $item->setItemCollection($itemCollection);
 
-        $form = $this->createForm(ItemType::class, $item);
+        $form = $this->createForm(ItemType::class, $item,
+        [
+            'itemTags' => $itemTag,
+        ]);
 
         $form->handleRequest($request);
 
@@ -68,12 +74,6 @@ class ItemController extends AbstractController
     {
         $form = $this->createForm(ItemType::class, $collection);
         $form->handleRequest($request);
-
-//        $currentUser = $this->getUser();
-
-//        if ($collection->getUser() !== $currentUser) {
-//            throw $this->createAccessDeniedException('You are not allowed to access this collection.');
-//        }
 
         if($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->flush();
@@ -103,7 +103,6 @@ class ItemController extends AbstractController
                     $itemsArray['id'] = $item->getId();
                     $itemsArray['name'] = $item->getName();
                     $listOfItems[] = $itemsArray;
-                 //   dd($item->getName());
                 }
             }
 
@@ -115,4 +114,48 @@ class ItemController extends AbstractController
         ]);
     }
 
+    #[Route('/item/{id}', name: 'app_item_id',  methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function showItem(Request $request): Response
+    {
+        $itemRepository = $this->entityManager->getRepository(Item::class);
+        $value = $request->attributes->get('id');
+        $item = $itemRepository->find($value);
+        $itemName = $item->getName();
+        $itemAttribute = $item->getItemAttribute();
+        $itemAttributeValue = $itemAttribute->getValue();
+
+        $itemAttributeValues = [$itemAttribute, $itemAttributeValue];
+
+        return $this->render('item/show.html.twig', [
+            'controller_name' => 'ItemController',
+        ]);
+    }
+
+        #[Route('/autocomplete/tags', name: 'autocomplete_tags',  methods: [Request::METHOD_GET])]
+        public function getTags(Request $request): JsonResponse
+        {
+            $query = $request->query->get('query');
+
+            $tags = $this->entityManager->getRepository(ItemTag::class)
+                ->createQueryBuilder('t')
+                ->where('LOWER(t.name) LIKE :searchTerm')
+                ->setParameter('searchTerm', '%' . $query . '%')
+                ->getQuery()
+                ->getResult();
+
+
+            $tagList = [];
+
+            foreach ($tags as $tag) {
+
+                $tagList[] = [
+                    'value' => (int) $tag->getId(),
+                    'text' => (string) $tag->getName(),
+                ];
+            }
+
+
+            return new JsonResponse(['results'=>$tagList]);
+
+        }
 }

@@ -31,16 +31,16 @@ class ItemType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('itemTags', BaseCollectionType::class, [
-            'entry_type' => TagType::class,
-            'entry_options' => ['label' => false],
-            'label' => false,
-            'allow_add' => true,
-            'allow_delete' => true,
-            'by_reference' => false,
-        ]
-    )
-    ;
+            ->add('itemTags', TextType::class, [
+                 'required' => false,
+                 'autocomplete' => true,
+                 'tom_select_options' => [
+                     'create' => true,
+                     'createOnBlur' => true,
+                     'delimiter' => ',',
+                 ],
+                 'autocomplete_url' => '/autocomplete/tags',
+             ]);
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) {
@@ -89,10 +89,6 @@ class ItemType extends AbstractType
                                 ]);
                                 break;
                         }
-//                        $form->add($customAttribute->getName(), ItemAttributeValueType::class, [
-//                            'label' => $customAttribute->getName(),
-//                            'mapped' => false,
-//                        ]);
                     }
                 }
             }
@@ -124,6 +120,7 @@ class ItemType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Item::class,
+            'itemTags' => null,
         ]);
     }
 
