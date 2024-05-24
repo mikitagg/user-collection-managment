@@ -18,7 +18,7 @@
         <div>
             <div class="row m-5">
                 <div class="col">
-                    <table class="table">
+                    <table id="myTable" class="table">
                         <thead>
                         <tr>
                             <th>id</th>
@@ -27,6 +27,7 @@
                             {% for attribute in items[0].attributes %}
                                 <th>{{ attribute }}</th>
                             {% endfor %}
+                            <th>action</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -38,6 +39,9 @@
                                 {% for value in item.values %}
                                     <td>{{ value }}</td>
                                 {% endfor %}
+                                <td>
+                                    <a href="/item/{{ item.id }}/update">edit</a>
+                                </td>
                             </tr>
                         {% else %}
                             <tr>
@@ -46,10 +50,13 @@
                         {% endfor %}
                         </tbody>
                     </table>
-
-
                 </div>
             </div>
         </div>
     </div>
+    <script>
+        $(document).ready(function() {
+            $('#myTable').DataTable();
+        });
+    </script>
 {% endblock %}

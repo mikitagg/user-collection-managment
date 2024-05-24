@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use AllowDynamicProperties;
 use App\Entity\ItemsCollection;
 use App\Form\CollectionType;
 use App\Repository\ItemsCollectionRepository;
@@ -17,7 +18,7 @@ class CollectionController extends AbstractController
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly Security $security
+        private readonly Security $security,
     )
     {
     }
@@ -26,6 +27,7 @@ class CollectionController extends AbstractController
     #[Route('/collection', name: 'app_collection')]
     public function index(): Response
     {
+
         return $this->render('collection/index.html.twig', [
             'controller_name' => 'CollectionController'
         ]);
@@ -62,12 +64,6 @@ class CollectionController extends AbstractController
         $form = $this->createForm(CollectionType::class, $collection);
         $form->handleRequest($request);
 
-//        $currentUser = $this->getUser();
-
-//        if ($collection->getUser() !== $currentUser) {
-//            throw $this->createAccessDeniedException('You are not allowed to access this collection.');
-//        }
-
         if($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->flush();
 
@@ -87,6 +83,8 @@ class CollectionController extends AbstractController
         $user = $this->getUser();
         $collection = [];
         $itemCollection = $itemsCollectionRepository->findByUser($user->getId());
+
+        $itemsCollection = $this->entityManager->getRepository(ItemsCollection::class)->findAll();
 
         foreach ($itemCollection as $itemsCollection) {
             $collectionValues['id'] = $itemsCollection->getId();

@@ -3,62 +3,45 @@
 {% block title %}Welcome{% endblock %}
 
 {% block body %}
+
     <div class="container">
-        <h2>{{ item_name }}</h2>
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title text-center">{{ item_name }}</h5>
+                    </div>
+                    {{ form_start(item_form) }}
 
-        {{ form_start(item_form) }}
-        {{ form_errors(item_form) }}
+                    {{ form_errors(item_form) }}
 
-        <div class="mb-3">
-            {{ form_row(item_form.name) }}
+                    <div class="mb-3">
+                        {{ form_label(item_form.name) }}
+                        {{ form_widget(item_form.name, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+
+                    <div class="mb-3">
+                    <div id="customItemAttributeValues">
+                        {% for field in item_form %}
+                            {% if (field.vars.name != 'name' and field.vars.name!= 'itemTags') %}
+
+                                {{ form_label(field) }}
+                                {{ form_widget(field, {'attr': {'class': 'form-control'}}) }}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(item_form.itemTags) }}
+                        {{ form_widget(item_form.itemTags, {'attr': {'class': 'form-control', 'id': 'tagsInput'}}) }}
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                </div>
+            </div>
         </div>
 
 
-        <div class="mb-3">
-        <div id="customItemAttributeValues">
-            {% for field in item_form %}
-                {% if (field.vars.name != 'name' and field.vars.name!= 'itemTags') %}
-                    {{ form_row(field) }}
-                {% endif %}
-            {% endfor %}
-        </div>
-        </div>
-
-        <div class="mb-3">
-            {{ form_label(item_form.itemTags) }}
-            {{ form_widget(item_form.itemTags, {'attr': {'class': 'form-control', 'id': 'tagsInput'}}) }}
-
-
-
-
-{#            <script>#}
-{#                $(document).ready(function() {#}
-{#                    // Initialize Tom Select on the element with the ID 'tagsInput'#}
-{#                    $('#item_itemTags').tomSelect({#}
-{#                        create: true,#}
-{#                        createOnBlur: true,#}
-{#                        delimiter: ',',#}
-{#                        ajax: {#}
-{#                            url: '/autocomplete/tags',#}
-{#                            type: 'GET',#}
-{#                            cache: false,#}
-{#                            dataType: 'json',#}
-{#                            data: function(term) {#}
-{#                                return { query: term };#}
-{#                            },#}
-{#                            processResults: function(data) {#}
-{#                                return {#}
-{#                                    results: data#}
-{#                                }#}
-{#                            }#}
-{#                        }#}
-{#                    });#}
-{#                });#}
-{#            </script>#}
-        </div>
-
-
-        <button type="submit">Submit</button>
         {{ form_end(item_form) }}
     </div>
 {% endblock %}
