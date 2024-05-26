@@ -129,11 +129,8 @@ class ItemController extends AbstractController
 
         $comments = $this->entityManager->getRepository(Comments::class)->findCommentsByItemId($item->getId());
 
-
-
         foreach ($comments as $com)
         {
-         //    $content['author'] = $com->getUsername();
              $content['content'] = $com->getContent();
              $commentsContent[] = $content;
         }
