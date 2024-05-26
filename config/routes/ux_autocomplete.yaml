@@ -1,0 +1,5 @@
+ux_autocomplete:
+#    resource: '@AutocompleteBundle/config/routes.php'
+#    prefix: '/autocomplete'
+    controller: App\Controller\TagController::getTags
+    path: '/autocomplete/tags'
