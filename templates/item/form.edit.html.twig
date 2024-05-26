@@ -15,16 +15,9 @@
                         {{ form_label(item_form.name) }}
                         {{ form_widget(item_form.name, {'attr': {'class': 'form-control'}}) }}
                     </div>
-                    <div class="mb-3">
-                    <div id="customItemAttributeValues">
-                        {% for field in item_form %}
-                            {% if (field.vars.name != 'name' and field.vars.name!= 'itemTags') %}
+                    <div>
 
-                                {{ form_label(field) }}
-                                {{ form_widget(field, {'attr': {'class': 'form-control'}}) }}
-                            {% endif %}
-                        {% endfor %}
-                    </div>
+                        {{ form_row(item_form.itemAttributeValue) }}
                     </div>
                     <div class="mb-3">
                         {{ form_label(item_form.itemTags) }}

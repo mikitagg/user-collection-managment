@@ -5,13 +5,13 @@ namespace App\Controller;
 use Elastica\Query;
 use Elastica\Query\BoolQuery;
 use Elastica\Query\MatchPhrasePrefix;
-use Elastica\Query\MatchQuery;
-use Elastica\Query\MultiMatch;
 use Elastica\Query\Nested;
 use FOS\ElasticaBundle\Finder\TransformedFinder;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class FindCollectionController
+class FindCollectionController extends AbstractController
 {
 
     public function __construct(
@@ -22,7 +22,7 @@ class FindCollectionController
 
 
     #[Route('/hello', name: 'hello', methods: ['GET', 'POST'])]
-    public function findsomething()
+    public function findsomething(): Response
     {
         $query = new Query();
         $boolQuery = new BoolQuery();
@@ -75,6 +75,8 @@ class FindCollectionController
         $nameQuery = new MatchPhrasePrefix('name', ';pl');
 
 
+
+
         $boolQuery->addShould($collectionQuery);
         $boolQuery->addShould($nameQuery);
         $boolQuery->addShould($categoryQuery);
@@ -86,8 +88,18 @@ class FindCollectionController
 
         $ans = $this->finder->find($query);
 
-        dd($ans);
 
+
+        $items = [];
+
+        foreach ($ans as $an) {
+            $items[] = $an->getId();
+        }
+
+
+        return $this->render('item/search.html.twig', [
+            'items' => $items,
+        ]);
     }
 
 }

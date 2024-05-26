@@ -7,16 +7,25 @@
     .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
     .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
     .last-items {border:solid;}
+    a { outline: none;
+        text-decoration: none;
+        margin-right: 0.625%;
+        text-align: center;
+        line-height: 3;
+        color: black;}
+
 </style>
 
 <div class="example-wrapper">
     <h2>Last 5 items:</h2>
     {% for item in items %}
+        <a href = '/item/{{ item.id }}'>
     <div class="last-items">
         <h3> {{ item.item }} </h3>
         <h3> {{ item.author }}</h3>
         <h3> {{ item.collection }}</h3>
     </div>
+        </a>
     {% endfor %}
 </div>
 {% endblock %}

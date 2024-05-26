@@ -32,11 +32,18 @@ class Item
     #[ORM\ManyToMany(targetEntity: ItemTag::class, mappedBy: 'Item', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $itemTags;
 
+    /**
+     * @var Collection<int, Comments>
+     */
+    #[ORM\OneToMany(targetEntity: Comments::class, mappedBy: 'Item')]
+    private Collection $comments;
+
 
     public function __construct()
     {
         $this->itemAttributeValue = new ArrayCollection();
         $this->itemTags = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -124,6 +131,36 @@ class Item
     {
         if ($this->itemTags->removeElement($itemTag)) {
             $itemTag->removeItem($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comments>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comments $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setItem($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comments $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getItem() === $this) {
+                $comment->setItem(null);
+            }
         }
 
         return $this;

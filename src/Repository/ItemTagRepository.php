@@ -16,20 +16,16 @@ class ItemTagRepository extends ServiceEntityRepository
         parent::__construct($registry, ItemTag::class);
     }
 
-    //    /**
-    //     * @return ItemTag[] Returns an array of ItemTag objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('i')
-    //            ->andWhere('i.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('i.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+
+        public function findByQuery($query): array
+        {
+            return $this->createQueryBuilder('t')
+                ->where('LOWER(t.name) LIKE :searchTerm')
+                ->setParameter('searchTerm', '%' . $query . '%')
+                ->getQuery()
+                ->getResult()
+                ;
+        }
 
     //    public function findOneBySomeField($value): ?ItemTag
     //    {

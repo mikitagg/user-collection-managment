@@ -24,25 +24,27 @@
                             <th>id</th>
                             <th>name</th>
                             <th>author</th>
-                            {% for attribute in items[0].attributes %}
-                                <th>{{ attribute }}</th>
-                            {% endfor %}
+{#                            {% for attribute in items[0].attributes %}#}
+{#                                <th>{{ attribute }}</th>#}
+{#                            {% endfor %}#}
                             <th>action</th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for item in items %}
+                            <a href="/item/{{ item.id }}">
                             <tr>
                                 <td>{{ item.id }}</td>
                                 <td>{{ item.name }}</td>
                                 <td>{{ item.author }}</td>
-                                {% for value in item.values %}
-                                    <td>{{ value }}</td>
-                                {% endfor %}
+{#                                {% for value in item.values %}#}
+{#                                    <td>{{ value }}</td>#}
+{#                                {% endfor %}#}
                                 <td>
                                     <a href="/item/{{ item.id }}/update">edit</a>
                                 </td>
                             </tr>
+                            </a>
                         {% else %}
                             <tr>
                                 <td colspan="{{ 3 + items[0].attributes|length }}">no records found</td>

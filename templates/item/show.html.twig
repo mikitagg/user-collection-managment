@@ -2,62 +2,41 @@
 
 {% block title %}users{% endblock %}
 
-{% block body %}
-    <div class="Container">
-        <div class="nav m-3 justify-content-end">
-            <div class="nav-item col-auto">
-                  <span>
-                      {{ app.user.userIdentifier }}
-                  </span>
-            </div>
-        </div>
-        <div class="card-header nav-item justify-content-end">
-            <h5 class="card-title text-center">Items</h5>
-        </div>
 
-        <div>
-{#            <form method="post" action="{{ path('userAction') }}">#}
-{#                <div class="mb-0 m-5">#}
-{#                    <button class="btn btn-danger btn-block" type="submit" name="action" value="delete">Delete</button>#}
-{#                    <button class="btn btn-light btn-block" type="submit" name="action" value="block">Block</button>#}
-{#                    <button class="btn btn-light btn-block" type="submit" name="action" value="unblock">Unblock</button>#}
-{#                </div>#}
-                <div class="row m-5">
-                    <div class="col">
-                        <table class="table">
-                            <thead>
-                            <tr>
-{#                                <th>#}
-{#                                    <label for="selectAllCheckbox"></label><input id="selectAllCheckbox" type="checkbox" class="checkAll">#}
-{#                                </th>#}
-                                <th>id</th>
-                                <th>name</th>
-                                <th>author</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for item in items %}
-                                <tr>
-{#                                    <td>#}
-{#                                        <label>#}
-{#                                            <input type="checkbox" class="check" name="selected_users[]"  value="{{ user.id }}">#}
-{#                                        </label>#}
-{#                                    </td>#}
-                                    <td>{{ item.id }}</td>
-                                    <td>{{ item.name }}</td>
-                                    <td>{{ item.author }}</td>
-                                </tr>
-                            {% else %}
-                                <tr>
-                                    <td colspan="7">no records found</td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-{#            </form>#}
-        </div>
+{% block body %}
+
+    <h4>Name: {{ name }}</h4>
+    <h4>Attributes</h4>
+    <div>
+    <table id="myTable" class="table">
+            <tbody>
+            {% for item in attributes %}
+                <tr>
+                    <td>{{ item.attribute }}</td>
+                    <td>{{ item.value }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
-{#    <script src="{{ asset('js/table.js') }}"></script>#}
+
+
+    <div class="comments">
+        <h2>Comments</h2>
+        {% if comments %}
+            <ul>
+                {% for comment in comments %}
+                    <li> {{ comment.content }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No comments yet.</p>
+        {% endif %}
+
+        <h3>Add a Comment</h3>
+        {{ form_start(comment_form) }}
+        {{ form_widget(comment_form.content) }}
+        <button type="submit">Submit</button>
+        {{ form_end(comment_form) }}
+    </div>
 {% endblock %}

@@ -4,9 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Item;
 use App\Entity\ItemsCollection;
-use App\Repository\ItemRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use phpDocumentor\Reflection\Utils;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -28,13 +26,11 @@ class MainController extends AbstractController
         $lastFiveItems = [];
 
         foreach ($items as $item) {
-            $itemName = $item->getName();
-            $itemCollectionId = $item->getItemCollection()->getId();
-            $itemCollection = $this->entityManager->getRepository(ItemsCollection::class)->find($itemCollectionId);
-            $itemCollectionName = $itemCollection->getName();
+            $itemCollection = $this->entityManager->getRepository(ItemsCollection::class)->find($item->getItemCollection()->getId());
+            $itemCollectionData['id'] = $item->getId();
             $itemCollectionData['author'] = $itemCollection->getUser()->getEmail();
-            $itemCollectionData['collection'] = $itemCollectionName;
-            $itemCollectionData['item'] = $itemName;
+            $itemCollectionData['collection'] = $itemCollection->getName();
+            $itemCollectionData['item'] = $item->getName();
             $lastFiveItems[] = $itemCollectionData;
         }
 

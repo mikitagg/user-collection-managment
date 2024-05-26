@@ -2,17 +2,16 @@
 
 namespace App\Controller;
 
-use App\Entity\CustomItemAttribute;
+use App\Entity\Comments;
 use App\Entity\Item;
-
-
 use App\Entity\ItemsCollection;
-use App\Entity\ItemTag;
+use App\Form\CommentType;
+use App\Form\ItemEditType;
 use App\Form\ItemType;
 use App\Repository\ItemTagRepository;
+use App\Service\CommentService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -27,29 +26,16 @@ class ItemController extends AbstractController
     {
     }
 
-    #[Route('/item', name: 'app_item')]
-    public function index(): Response
-    {
-        return $this->render('item/index.html.twig', [
-            'controller_name' => 'ItemController',
-        ]);
-    }
-
     #[Route('/item/create', name: 'item_create')]
     public function create(Request $request, EntityManagerInterface $entityManager, ItemTagRepository $itemTagRepository): Response
     {
         $item = new Item();
         $this->denyAccessUnlessGranted('ROLE_USER');
-        $itemTag = $itemTagRepository->findAll();
-        $itemCollectionRepository = $entityManager->getRepository(ItemsCollection::class);
-        $itemCollection = $itemCollectionRepository->find(19);
-        $itemCollectionName = $itemCollection->getName();
-        $item->setItemCollection($itemCollection);
+        $item->setItemCollection($entityManager->getRepository(ItemsCollection::class)->findWithCustomAttributes(19));
+
 
         $form = $this->createForm(ItemType::class, $item,
-        [
-            'itemTags' => $itemTag,
-        ]);
+        );
 
         $form->handleRequest($request);
 
@@ -61,15 +47,14 @@ class ItemController extends AbstractController
 
         return $this->render('item/form.html.twig', [
             'item_form' => $form->createView(),
-            'item_name' => $itemCollectionName,
         ]);
     }
 
     #[Route('/item/{id}/update', name: 'app_item_update', methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    public function update(Request $request, Item $collection): Response
+    public function update(Request $request, Item $item): Response
     {
-        $itemName = $collection->getItemCollection()->getName();
-        $form = $this->createForm(ItemType::class, $collection);
+        $collectionName = $item->getItemCollection()->getName();
+        $form = $this->createForm(ItemEditType::class, $item);
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()) {
@@ -79,33 +64,7 @@ class ItemController extends AbstractController
 
         return $this->render('item/form.html.twig', [
             'item_form' => $form->createView(),
-            'item_name' => $itemName,
-        ]);
-    }
-
-    #[Route('/item/show', name: 'app_item_show',  methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    public function show(Item $item): Response
-    {
-        $user = $this->security->getUser();
-        $itemCollectionRepository = $this->entityManager->getRepository(ItemsCollection::class);
-        $itemCollection = $itemCollectionRepository->findByUser($user->getId());
-        $itemsArray = [];
-        $listOfItems = [];
-
-            foreach ($itemCollection as $items) {
-                foreach ($items->getItems() as $item) {
-
-                    $itemsArray['id'] = $item->getId();
-                    $itemsArray['name'] = $item->getName();
-                    $itemsArray['author'] = $item->getItemCollection()->getUser()->getEmail();
-
-                    $listOfItems[] = $itemsArray;
-                }
-            }
-
-        return $this->render('item/show.html.twig', [
-            'controller_name' => 'ItemController',
-            'items' => $listOfItems,
+            'item_name' => $collectionName,
         ]);
     }
 
@@ -116,7 +75,6 @@ class ItemController extends AbstractController
         $itemCollectionName = $itemsCollection->getName();
         $items = $itemsCollection->getItems();
         $listOfItems = [];
-        $attributes = [];
 
 
         foreach ($items as $item) {
@@ -124,17 +82,17 @@ class ItemController extends AbstractController
             $itemsValue['name'] = $item->getName();
             $itemsValue['author'] = $item->getItemCollection()->getUser()->getEmail();
             $itemsValue['collection'] = $item->getItemCollection()->getName();
-            $itemsAttributes = [];
-            $itemsAttributesValue = [];
-
-            foreach ($item->getItemAttributeValue() as $attributeValue) {
-                $attributeName = $attributeValue->getName();
-                $attribute = $attributeValue->getCustomItemAttribute()->getName();
-                $itemsAttributesValue[] = $attributeName;
-                $itemsAttributes[] = $attribute;
-            }
-            $itemsValue['attributes'] = $itemsAttributes;
-            $itemsValue['values'] = $itemsAttributesValue;
+//            $itemsAttributes = [];
+//            $itemsAttributesValue = [];
+//
+//            foreach ($item->getItemAttributeValue() as $attributeValue) {
+//                $attributeName = $attributeValue->getName();
+//                $attribute = $attributeValue->getCustomItemAttribute()->getName();
+//                $itemsAttributesValue[] = $attributeName;
+//                $itemsAttributes[] = $attribute;
+//            }
+//            $itemsValue['attributes'] = $itemsAttributes;
+//            $itemsValue['values'] = $itemsAttributesValue;
             $listOfItems[] = $itemsValue;
         }
 
@@ -147,41 +105,57 @@ class ItemController extends AbstractController
 
 
     #[Route('/item/{id}', name: 'app_item_id',  methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    public function showItem(Request $request, Item $item): Response
+    public function showItem(Request $request, Item $item, CommentService $commentService): Response
     {
-//        $itemRepository = $this->entityManager->getRepository(Item::class);
-//        $value = $request->attributes->get('id');
-//        $item = $itemRepository->find($value);
-        $itemName = $item->getName();
-        $itemAttribute = $item->getItemAttribute();
-        $itemAttributeValue = $itemAttribute->getValue();
 
-        $itemAttributeValues = [$itemAttribute, $itemAttributeValue];
+        $itemName = $item->getName();
+        $commentsContent = [];
+        $tagsArr = [];
+        $attributes = [];
+
+        $items = $this->entityManager->getRepository(Item::class)->findItemAttributes($item->getId());
+
+        foreach ($items->getItemAttributeValue() as $attributeValue) {
+            $attribute['attribute'] = $attributeValue->getCustomItemAttribute()->getName();
+            $attribute['value'] = $attributeValue->getName();
+            $attributes[] = $attribute;
+        }
+
+        $tags = $item->getItemTags();
+
+        foreach ($tags as $tag) {
+            $tagsArr[] = $tag->getName();
+        }
+
+        $comments = $this->entityManager->getRepository(Comments::class)->findCommentsByItemId($item->getId());
+
+
+
+        foreach ($comments as $com)
+        {
+         //    $content['author'] = $com->getUsername();
+             $content['content'] = $com->getContent();
+             $commentsContent[] = $content;
+        }
+
+        $comment = $commentService->initializeComment($this->getUser(), $item);
+
+        $commentForm = $this->createForm(CommentType::class, $comment);
+        $commentForm->handleRequest($request);
+        if($commentForm->isSubmitted() && $commentForm->isValid()) {
+            $this->entityManager->persist($comment);
+            $this->entityManager->flush();
+        }
 
         return $this->render('item/show.html.twig', [
             'controller_name' => 'ItemController',
+            'attributes' => $attributes,
+            'name' => $itemName,
+            'comment_form' => $commentForm->createView(),
+            'tags' => $tagsArr,
+            'comments' => $commentsContent,
         ]);
     }
 
-        #[Route('/autocomplete/tags', name: 'autocomplete_tags',  methods: [Request::METHOD_GET])]
-        public function getTags(Request $request): JsonResponse
-        {
-            $query = $request->query->get('query');
-            $tags = $this->entityManager->getRepository(ItemTag::class)
-                ->createQueryBuilder('t')
-                ->where('LOWER(t.name) LIKE :searchTerm')
-                ->setParameter('searchTerm', '%' . $query . '%')
-                ->getQuery()
-                ->getResult();
 
-            $tagList = [];
-
-            foreach ($tags as $tag) {
-                $tagList[] = [
-                    'value' => (int) $tag->getId(),
-                    'text' => (string) $tag->getName(),
-                ];
-            }
-            return new JsonResponse(['results'=>$tagList]);
-        }
 }

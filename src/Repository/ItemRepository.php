@@ -25,6 +25,21 @@ class ItemRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findItemAttributes($itemId)
+    {
+        return $this->createQueryBuilder('i')
+            ->leftJoin('i.itemAttributeValue', 'v')
+            ->leftJoin('v.customItemAttribute', 'c')
+            ->addSelect('v')
+            ->addSelect('c')
+            ->where('i.id = :id')
+            ->setParameter('id', $itemId)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+    }
+
+
 
     //    /**
     //     * @return Item[] Returns an array of Item objects

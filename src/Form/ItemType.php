@@ -48,12 +48,12 @@ class ItemType extends AbstractType
                 $form = $event->getForm();
                 $data = $event->getData();
 
-                $itemCollectionRepository = $this->entityManager->getRepository(ItemsCollection::class);
-                $customAttributes = $itemCollectionRepository->findWithCustomAttributes($data->getItemCollection()->getId());
+                $customAttributes = $data->getItemCollection()->getCustomItemAttributes();
 
                 if($customAttributes) {
-                    foreach ($customAttributes->getCustomItemAttributes() as $customAttribute) {
+                    foreach ($customAttributes as $customAttribute) {
                         $customAttributeType = $customAttribute->getType()->value;
+
                         switch ($customAttributeType) {
                             case 'INT':
                                 $form->add($customAttribute->getName(), IntegerType::class, [
@@ -100,15 +100,13 @@ class ItemType extends AbstractType
             function (FormEvent $event) {
                 $form = $event->getForm();
                 $data = $event->getData();
-                $itemCollectionRepository = $this->entityManager->getRepository(ItemsCollection::class);
-                $customAttributes = $itemCollectionRepository->findWithCustomAttributes($data->getItemCollection()->getId());
                 $i = 0;
                 foreach ($form as $field) {
                     if ($field->getConfig()->getOption('mapped') === false) {
                         $attributeValue = new ItemAttributeValue();
                         $attributeValue->setItem($data->getId());
                         $attributeValue->setName($field->getViewData());
-                        $attributeValue->setCustomItemAttribute($customAttributes->getCustomItemAttributes()[$i]);
+                        $attributeValue->setCustomItemAttribute($data->getItemCollection()->getCustomItemAttributes()[$i]);
                         $i++;
                         $data->addItemAttributeValue($attributeValue);
                     }
