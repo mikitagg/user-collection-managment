@@ -22,9 +22,6 @@ class ItemsCollection
     #[ORM\Column(type: Types::TEXT)]
     private ?string $description = null;
 
-    /**
-     * @var Collection<int, Item>
-     */
     #[ORM\OneToMany(targetEntity: Item::class, mappedBy: 'itemCollection', orphanRemoval: true)]
     private Collection $items;
 
@@ -34,7 +31,7 @@ class ItemsCollection
     #[ORM\OneToMany(targetEntity: CustomItemAttribute::class, mappedBy: 'itemCollection', cascade: ["persist"], orphanRemoval: true)]
     private Collection $customItemAttributes;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'user')]
+    #[ORM\ManyToOne(inversedBy: 'itemCollection')]
     private ?User $user;
 
     #[ORM\ManyToOne(inversedBy: 'itemCollection')]

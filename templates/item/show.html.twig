@@ -4,6 +4,7 @@
 
 
 {% block body %}
+    {% include 'header.html.twig' %}
 
     <h4>Name: {{ name }}</h4>
     <h4>Attributes</h4>
@@ -26,7 +27,10 @@
         {% if comments %}
             <ul>
                 {% for comment in comments %}
-                    <li> {{ comment.content }}</li>
+                    <div>
+                        <small> {{ comment.username.email }}</small>
+                        <span> {{ comment.content }}</span>
+                    </div>
                 {% endfor %}
             </ul>
         {% else %}
@@ -34,8 +38,8 @@
         {% endif %}
 
         <h3>Add a Comment</h3>
-        {{ form_start(comment_form) }}
-        {{ form_widget(comment_form.content) }}
+            {{ form_start(comment_form) }}
+            {{ form_widget(comment_form.content) }}
         <button type="submit">Submit</button>
         {{ form_end(comment_form) }}
     </div>

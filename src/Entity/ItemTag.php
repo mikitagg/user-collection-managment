@@ -23,11 +23,11 @@ class ItemTag
      * @var Collection<int, Item>
      */
     #[ORM\ManyToMany(targetEntity: Item::class, inversedBy: 'itemTags')]
-    private Collection $Item;
+    private Collection $item;
 
     public function __construct()
     {
-        $this->Item = new ArrayCollection();
+        $this->item = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -51,13 +51,13 @@ class ItemTag
      */
     public function getItem(): Collection
     {
-        return $this->Item;
+        return $this->item;
     }
 
     public function addItem(Item $item): static
     {
-        if (!$this->Item->contains($item)) {
-            $this->Item->add($item);
+        if (!$this->item->contains($item)) {
+            $this->item->add($item);
         }
 
         return $this;
@@ -65,7 +65,7 @@ class ItemTag
 
     public function removeItem(Item $item): static
     {
-        $this->Item->removeElement($item);
+        $this->item->removeElement($item);
 
         return $this;
     }

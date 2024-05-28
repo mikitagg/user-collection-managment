@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\UserStatus;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -9,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -24,20 +26,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180)]
     private ?string $email = null;
 
-    #[ORM\OneToMany(targetEntity: ItemsCollection::class, mappedBy: 'user', cascade: ["persist"], orphanRemoval: true)]
-    private Collection $itemsCollection;
+    #[ORM\OneToMany(targetEntity: ItemsCollection::class, mappedBy: 'user')]
+    private Collection $itemCollection;
 
-    /**
-     * @var list<string> The user roles
-     */
     #[ORM\Column]
     private array $roles = [];
 
-    /**
-     * @var string The hashed password
-     */
     #[ORM\Column]
     private ?string $password;
+
+    #[ORM\Column(type: 'smallint', enumType: UserStatus::class)]
+    #[Assert\Type(type: UserStatus::class)]
+    private ?UserStatus $status;
 
     /**
      * @var Collection<int, Comments>
@@ -47,8 +47,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->itemsCollection = new ArrayCollection();
+        $this->itemCollection = new ArrayCollection();
         $this->comments = new ArrayCollection();
+        $this->status = UserStatus::Active;
     }
 
 
@@ -120,19 +121,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getItemsCollection(): Collection
     {
-        return $this->itemsCollection;
+        return $this->itemCollection;
     }
 
     public function setItemsCollection(Collection $itemsCollection): static
     {
-        $this->itemsCollection = $itemsCollection;
+        $this->itemCollection = $itemsCollection;
         return $this;
     }
 
     public function addItemsCollection(ItemsCollection $itemsCollection): static
     {
-        if (!$this->itemsCollection->contains($itemsCollection)) {
-            $this->itemsCollection->add($itemsCollection);
+        if (!$this->itemCollection->contains($itemsCollection)) {
+            $this->itemCollection->add($itemsCollection);
             $itemsCollection->setUser($this);
         }
 
@@ -141,7 +142,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeItemsCollection(ItemsCollection $itemsCollection): static
     {
-        if ($this->itemsCollection->removeElement($itemsCollection)) {
+        if ($this->itemCollection->removeElement($itemsCollection)) {
             // set the owning side to null (unless already changed)
             if ($itemsCollection->getUser() === $this) {
                 $itemsCollection->setUser(null);
@@ -185,4 +186,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getStatus(): ?UserStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?UserStatus $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+
 }

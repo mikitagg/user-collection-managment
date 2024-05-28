@@ -5,37 +5,41 @@ namespace App\Controller;
 use App\Entity\Comments;
 use App\Entity\Item;
 use App\Entity\ItemsCollection;
+use App\Entity\ItemTag;
 use App\Form\CommentType;
 use App\Form\ItemEditType;
 use App\Form\ItemType;
+use App\Repository\ItemRepository;
+use App\Repository\ItemsCollectionRepository;
 use App\Repository\ItemTagRepository;
 use App\Service\CommentService;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\SecurityBundle\Security;
 
+
+#[Route('/item')]
 class ItemController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly Security $security
+        private readonly Security $security,
+        private readonly PaginatorInterface $paginator
     )
     {
     }
 
-    #[Route('/item/create', name: 'item_create')]
-    public function create(Request $request, EntityManagerInterface $entityManager, ItemTagRepository $itemTagRepository): Response
+    #[Route('/{id}/create', name: 'item_create')]
+    public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
+        $id = $request->get('id');
         $item = new Item();
-        $this->denyAccessUnlessGranted('ROLE_USER');
-        $item->setItemCollection($entityManager->getRepository(ItemsCollection::class)->findWithCustomAttributes(19));
-
-
-        $form = $this->createForm(ItemType::class, $item,
-        );
+        $item->setItemCollection($entityManager->getRepository(ItemsCollection::class)->findWithCustomAttributes($id));
+        $form = $this->createForm(ItemType::class, $item);
 
         $form->handleRequest($request);
 
@@ -50,11 +54,11 @@ class ItemController extends AbstractController
         ]);
     }
 
-    #[Route('/item/{id}/update', name: 'app_item_update', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    #[Route('/{id}/update', name: 'app_item_update', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function update(Request $request, Item $item): Response
     {
         $collectionName = $item->getItemCollection()->getName();
-        $form = $this->createForm(ItemEditType::class, $item);
+        $form = $this->createForm(ItemType::class, $item);
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()) {
@@ -68,49 +72,32 @@ class ItemController extends AbstractController
         ]);
     }
 
-    #[Route('/item/collection/{id}', name: 'app_item_collection',  methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    public function showCollectionItems(Request $request, ItemsCollection $itemsCollection): Response
+    #[Route('/collection/{id}', name: 'app_item_collection',  methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function showCollectionItems(Request $request, ItemRepository $repository): Response
     {
-        $user = $this->security->getUser();
-        $itemCollectionName = $itemsCollection->getName();
-        $items = $itemsCollection->getItems();
-        $listOfItems = [];
 
+        $collection = $repository->find($request->get('id'));
 
-        foreach ($items as $item) {
-            $itemsValue['id'] = $item->getId();
-            $itemsValue['name'] = $item->getName();
-            $itemsValue['author'] = $item->getItemCollection()->getUser()->getEmail();
-            $itemsValue['collection'] = $item->getItemCollection()->getName();
-//            $itemsAttributes = [];
-//            $itemsAttributesValue = [];
-//
-//            foreach ($item->getItemAttributeValue() as $attributeValue) {
-//                $attributeName = $attributeValue->getName();
-//                $attribute = $attributeValue->getCustomItemAttribute()->getName();
-//                $itemsAttributesValue[] = $attributeName;
-//                $itemsAttributes[] = $attribute;
-//            }
-//            $itemsValue['attributes'] = $itemsAttributes;
-//            $itemsValue['values'] = $itemsAttributesValue;
-            $listOfItems[] = $itemsValue;
-        }
+        $items = $repository->findBy(['itemCollection' => $collection]);
+
+        $pagination = $this->paginator->paginate(
+            $items,
+            $request->query->getInt('page', 1),
+            $request->query->getInt('limit',  20)
+        );
 
         return $this->render('item/table.html.twig', [
             'controller_name' => 'ItemController',
-            'items' => $listOfItems,
-            'collection' => $itemCollectionName,
+            'pagination' => $pagination,
         ]);
     }
 
 
-    #[Route('/item/{id}', name: 'app_item_id',  methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    #[Route('/{id}', name: 'app_item_id',  methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function showItem(Request $request, Item $item, CommentService $commentService): Response
     {
 
         $itemName = $item->getName();
-        $commentsContent = [];
-        $tagsArr = [];
         $attributes = [];
 
         $items = $this->entityManager->getRepository(Item::class)->findItemAttributes($item->getId());
@@ -121,24 +108,14 @@ class ItemController extends AbstractController
             $attributes[] = $attribute;
         }
 
-        $tags = $item->getItemTags();
-
-        foreach ($tags as $tag) {
-            $tagsArr[] = $tag->getName();
-        }
-
         $comments = $this->entityManager->getRepository(Comments::class)->findCommentsByItemId($item->getId());
 
-        foreach ($comments as $com)
-        {
-             $content['content'] = $com->getContent();
-             $commentsContent[] = $content;
-        }
 
         $comment = $commentService->initializeComment($this->getUser(), $item);
 
         $commentForm = $this->createForm(CommentType::class, $comment);
         $commentForm->handleRequest($request);
+
         if($commentForm->isSubmitted() && $commentForm->isValid()) {
             $this->entityManager->persist($comment);
             $this->entityManager->flush();
@@ -149,8 +126,8 @@ class ItemController extends AbstractController
             'attributes' => $attributes,
             'name' => $itemName,
             'comment_form' => $commentForm->createView(),
-            'tags' => $tagsArr,
-            'comments' => $commentsContent,
+//            'tags' => $tagsArr,
+            'comments' => $comments,
         ]);
     }
 

@@ -2,38 +2,30 @@
 
 namespace App\Controller;
 
-use AllowDynamicProperties;
+use App\Entity\ItemAttributeValue;
 use App\Entity\ItemsCollection;
 use App\Form\CollectionType;
 use App\Repository\ItemsCollectionRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[Route('/collection')]
 class CollectionController extends AbstractController
 {
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly Security $security,
+        private readonly PaginatorInterface $paginator
     )
     {
     }
 
-
-    #[Route('/collection', name: 'app_collection')]
-    public function index(): Response
-    {
-
-        return $this->render('collection/index.html.twig', [
-            'controller_name' => 'CollectionController'
-        ]);
-    }
-
-    #[Route('/collection/create', name: 'app_collection_create')]
+    #[Route('/create', name: 'app_collection_create')]
     public function create(Request $request): Response
     {
         $itemsCollection = new ItemsCollection();
@@ -41,13 +33,10 @@ class CollectionController extends AbstractController
         $form = $this->createForm(CollectionType::class, $itemsCollection);
         $form->handleRequest($request);
 
-
         if ($form->isSubmitted() && $form->isValid()) {
             $collection = $form->getData();
-
             $this->entityManager->persist($collection);
             $this->entityManager->flush();
-
             $this->addFlash('success', 'Collection created.');
         }
 
@@ -58,9 +47,11 @@ class CollectionController extends AbstractController
 
     }
 
-    #[Route('/collection/{id}/update', name: 'app_collection_update', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    #[Route('/{id}/update', name: 'app_collection_update', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    #[IsGranted('edit', 'collection', 'You have no permission to update this collection', 404)]
     public function update(Request $request, ItemsCollection $collection): Response
     {
+
         $form = $this->createForm(CollectionType::class, $collection);
         $form->handleRequest($request);
 
@@ -77,57 +68,52 @@ class CollectionController extends AbstractController
         ]);
     }
 
-    #[Route('/collection/user', name: 'app_collection_user', methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    public function show(Request $request, ItemsCollectionRepository $itemsCollectionRepository): Response
+
+
+    #[Route('/show/all', name: 'app_collection_show_all', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function showAllCollections(Request $request, ItemsCollectionRepository $itemsCollectionRepository): Response
     {
-        $user = $this->getUser();
-        $collection = [];
-        $itemCollection = $itemsCollectionRepository->findByUser($user->getId());
+        $query = $itemsCollectionRepository->getItemCollectionWithAuthorAndCategory();
 
-        $itemsCollection = $this->entityManager->getRepository(ItemsCollection::class)->findAll();
+        $pagination = $this->paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            $request->query->getInt('limit',  20)
+        );
 
-        foreach ($itemCollection as $itemsCollection) {
-            $collectionValues['id'] = $itemsCollection->getId();
-            $collectionValues['name'] = $itemsCollection->getName();
-            $collectionValues['description'] = $itemsCollection->getDescription();
-            $attributes = $itemsCollection->getCustomItemAttributes();
-            $customAttribute = [];
-
-            foreach ($attributes as $attribute) {
-                $customAttribute[] = $attribute->getName();
-            }
-            $collectionValues['attributes'] = $customAttribute;
-
-            $collection[] = $collectionValues;
-
-        }
-
-        return $this->render('collection/table.html.twig', [
+        return $this->render('collection/showall.html.twig', [
             'action' => 'create',
-            'collection' => $collection,
+            'pagination' => $pagination,
+
         ]);
     }
 
-
-    #[Route('/collection/show', name: 'app_collection_show', methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    public function userCollection(Request $request): Response
+    #[Route('/show/user/{id}/', name: 'app_collection_show_user', methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function showUserCollections(Request $request, ItemsCollectionRepository $itemsCollectionRepository): Response
     {
-        $user = $this->getUser();
+        $user_id = $request->get('id');
 
-        $collection = [];
-        $attributeValues = [];
-        $itemCollectionRepository = $this->entityManager->getRepository(ItemsCollection::class);
-        $itemCollection = $itemCollectionRepository->findByUser($user->getId());
+        $userItemCollections = $itemsCollectionRepository->getItemCollectionWithCategories($user_id);
 
-        foreach ($itemCollection as $itemsCollection) {
-            $collection['name'] = $itemsCollection->getName();
-            $collection['id'] = $itemsCollection->getId();
-            $attributeValues[] = $collection;
-        }
+        $pagination = $this->paginator->paginate(
+            $userItemCollections,
+            $request->query->getInt('page', 1),
+            $request->query->getInt('limit',  20)
+        );
 
-        return $this->render('collection/show.html.twig', [
-            'action' => 'create',
-            'attributeValues' => $attributeValues,
+        return $this->render('collection/show_user_collection.html.twig', [
+            'pagination' => $pagination,
         ]);
     }
+
+    #[Route('/{id}/delete', name: 'app_collection_delete', methods: ['GET', 'POST'])]
+    public function delete(Request $request, EntityManagerInterface $entityManager, ItemsCollection $collection): Response
+    {
+
+        $entityManager->remove($collection);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_collection_show_user', ['id' => $this->getUser()->getId()]);
+    }
+
 }

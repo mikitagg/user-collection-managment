@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\ItemsCollection;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -26,6 +27,45 @@ class ItemsCollectionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+
+    public function getItemCollectionWithCategories($user)
+    {
+        return $this->createQueryBuilder('i')
+            ->leftJoin('i.collectionCategory', 'c')
+            ->leftJoin('i.user', 'u')
+            ->addSelect('u')
+            ->addSelect('c')
+            ->where('i.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
+
+    }
+
+    public function findTopFiveCollections()
+    {
+        return $this->createQueryBuilder('ic')
+            ->leftJoin('ic.items', 'i') // Assuming the association is named 'items'
+            ->addSelect('COUNT(i) as itemCount')
+            ->groupBy('ic.id')
+            ->orderBy('itemCount', 'DESC')
+            ->setMaxResults(5)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getItemCollectionWithAuthorAndCategory()
+    {
+        return $this->createQueryBuilder('i')
+            ->leftJoin('i.collectionCategory', 'c')
+            ->leftJoin('i.user', 'u')
+            ->addSelect('u')
+            ->addSelect('c')
+            ->getQuery()
+            ->getResult();
+    }
+
 
 
     //    /**

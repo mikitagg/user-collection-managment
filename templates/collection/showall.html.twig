@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% include 'header.html.twig' %}
+
+<div>
+    <div class="row m-5">
+        <div class="col">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>{{ knp_pagination_sortable(pagination, 'Id', 'id') }}</th>
+                        <th{% if pagination.isSorted('name') %} class="sorted"{% endif %}>
+                            {{ knp_pagination_sortable(pagination, 'Name', 'name') }}
+                        </th>
+                        <th{% if pagination.isSorted('desctiption') %} class="sorted"{% endif %}>
+                            {{ knp_pagination_sortable(pagination, 'Description', 'description') }}
+                        </th>
+                        <th{% if pagination.isSorted('user.email') %} class="sorted"{% endif %}>
+                            {{ knp_pagination_sortable(pagination, 'Author', 'user.email') }}
+                        <th{% if pagination.isSorted('collectionCategory.name') %} class="sorted"{% endif %}>
+                            {{ knp_pagination_sortable(pagination, 'Category', 'collectionCategory.name') }}
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for collection in pagination %}
+                        <tr>
+                            <td>{{ collection.id }}</td>
+                            <td>{{ collection.name }}</td>
+                            <td>{{ collection.description }}</td>
+                            <td>{{ collection.user.email }}</td>
+                            <td>{{ collection.collectionCategory.name }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="navigation">
+                {{ knp_pagination_render(pagination) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

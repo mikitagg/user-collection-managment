@@ -3,62 +3,38 @@
 {% block title %}users{% endblock %}
 
 {% block body %}
-    <div class="Container">
-        <div class="nav m-3 justify-content-end">
-            <div class="nav-item col-auto">
-                  <span>
-                      {{ app.user.userIdentifier }}
-                  </span>
-            </div>
-        </div>
-        <div class="card-header nav-item justify-content-end">
-            <h5 class="card-title text-center">{{ collection }} Collection Items</h5>
-        </div>
-
+    {% include 'header.html.twig' %}
         <div>
             <div class="row m-5">
                 <div class="col">
-                    <table id="myTable" class="table">
+                    <table class="table table-bordered">
                         <thead>
-                        <tr>
-                            <th>id</th>
-                            <th>name</th>
-                            <th>author</th>
-{#                            {% for attribute in items[0].attributes %}#}
-{#                                <th>{{ attribute }}</th>#}
-{#                            {% endfor %}#}
-                            <th>action</th>
-                        </tr>
+                            <tr class="d-flex">
+                                <th>{{ knp_pagination_sortable(pagination, 'Id', 'id') }}</th>
+                                <th{% if pagination.isSorted('name') %} class="sorted"{% endif %}>
+                                    {{ knp_pagination_sortable(pagination, 'Name', 'name') }}
+                                </th>
+    {#                            <th{% if pagination.isSorted('') %} class="sorted"{% endif %}>#}
+    {#                                {{ knp_pagination_sortable(pagination, 'Author', 'user.email') }}#}
+    {#                            <th{% if pagination.isSorted('collectionCategory.name') %} class="sorted"{% endif %}>#}
+    {#                                {{ knp_pagination_sortable(pagination, 'Category', 'collectionCategory.name') }}#}
+
+                            </tr>
                         </thead>
                         <tbody>
-                        {% for item in items %}
-                            <a href="/item/{{ item.id }}">
-                            <tr>
-                                <td>{{ item.id }}</td>
-                                <td>{{ item.name }}</td>
-                                <td>{{ item.author }}</td>
-{#                                {% for value in item.values %}#}
-{#                                    <td>{{ value }}</td>#}
-{#                                {% endfor %}#}
-                                <td>
-                                    <a href="/item/{{ item.id }}/update">edit</a>
-                                </td>
-                            </tr>
-                            </a>
-                        {% else %}
-                            <tr>
-                                <td colspan="{{ 3 + items[0].attributes|length }}">no records found</td>
+                        {% for item in pagination %}
+                            <tr class="d-flex">
+                                    <td>{{ item.id }}</td>
+                                    <td>{{ item.name }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
                     </table>
+
+                    <div class="navigation">
+                        {{ knp_pagination_render(pagination) }}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <script>
-        $(document).ready(function() {
-            $('#myTable').DataTable();
-        });
-    </script>
 {% endblock %}

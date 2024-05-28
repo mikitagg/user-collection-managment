@@ -23,19 +23,19 @@ class Item
     private ?ItemsCollection $itemCollection = null;
 
 
-    #[ORM\OneToMany(targetEntity: ItemAttributeValue::class, mappedBy: 'item', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: ItemAttributeValue::class, mappedBy: 'item', cascade: ['persist'], orphanRemoval: true)]
     private Collection $itemAttributeValue;
 
     /**
      * @var Collection<int, ItemTag>
      */
-    #[ORM\ManyToMany(targetEntity: ItemTag::class, mappedBy: 'Item', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\ManyToMany(targetEntity: ItemTag::class, mappedBy: 'item', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $itemTags;
 
     /**
      * @var Collection<int, Comments>
      */
-    #[ORM\OneToMany(targetEntity: Comments::class, mappedBy: 'Item')]
+    #[ORM\OneToMany(targetEntity: Comments::class, mappedBy: 'Item', orphanRemoval: true)]
     private Collection $comments;
 
 

@@ -23,7 +23,7 @@ services:
             - '../src/Kernel.php'
 
 
-    App\Controller\FindCollectionController:
+    App\Controller\FindItemController:
         tags: [ 'controller.service_arguments' ]
         public: true
         arguments:

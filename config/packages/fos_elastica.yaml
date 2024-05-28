@@ -33,6 +33,8 @@ fos_elastica:
                 finder: ~
                 model: App\Entity\Item
 
+
+
 #                collection_category_id:
 #                    type: integer
 #                    index: false

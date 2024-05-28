@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\CustomItemAttribute;
 use App\Entity\Item;
 use App\Entity\ItemAttributeValue;
 use App\Entity\ItemsCollection;
@@ -49,7 +50,6 @@ class ItemType extends AbstractType
                 $data = $event->getData();
 
                 $customAttributes = $data->getItemCollection()->getCustomItemAttributes();
-
                 if($customAttributes) {
                     foreach ($customAttributes as $customAttribute) {
                         $customAttributeType = $customAttribute->getType()->value;
@@ -101,14 +101,24 @@ class ItemType extends AbstractType
                 $form = $event->getForm();
                 $data = $event->getData();
                 $i = 0;
+
                 foreach ($form as $field) {
                     if ($field->getConfig()->getOption('mapped') === false) {
-                        $attributeValue = new ItemAttributeValue();
-                        $attributeValue->setItem($data->getId());
-                        $attributeValue->setName($field->getViewData());
-                        $attributeValue->setCustomItemAttribute($data->getItemCollection()->getCustomItemAttributes()[$i]);
-                        $i++;
-                        $data->addItemAttributeValue($attributeValue);
+                        if(!$data->getId())
+                        {
+                            $attributeValue = new ItemAttributeValue();
+                            $attributeValue->setItem($data->getId());
+                            $attributeValue->setName($field->getViewData());
+                            $attributeValue->setCustomItemAttribute($data->getItemCollection()->getCustomItemAttributes()[$i]);
+                            $data->addItemAttributeValue($attributeValue);
+                            $i++;
+                        }
+                        if($data->getId())
+                        {
+                            $customItemAttribute = $this->entityManager->getRepository(CustomItemAttribute::class)->findOneBy(['name' => $field->getName(),'itemCollection' => $data->getItemCollection()->getId()]);
+                            $attributeValue = $this->entityManager->getRepository(ItemAttributeValue::class)->findOneBy(['customItemAttribute' => $customItemAttribute->getId(),'item' => $data->getId()]);
+                            $attributeValue->setName($field->getViewData());
+                        }
                     }
                 }
             }

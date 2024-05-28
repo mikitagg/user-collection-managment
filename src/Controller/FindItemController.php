@@ -8,11 +8,13 @@ use Elastica\Query\MatchPhrasePrefix;
 use Elastica\Query\Nested;
 use FOS\ElasticaBundle\Finder\TransformedFinder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class FindCollectionController extends AbstractController
+class FindItemController extends AbstractController
 {
+
 
     public function __construct(
         private readonly TransformedFinder $finder,
@@ -21,25 +23,27 @@ class FindCollectionController extends AbstractController
     }
 
 
-    #[Route('/hello', name: 'hello', methods: ['GET', 'POST'])]
-    public function findsomething(): Response
+    #[Route('/find/item', name: 'find_item', methods: ['GET', 'POST'])]
+    public function findItem(Request $request): Response
     {
         $query = new Query();
         $boolQuery = new BoolQuery();
-
+        $search = $request->get('q');
 
         $collectionQuery = new Nested();
         $collectionQuery->setPath('item_collection');
+
         $collectionQuery->setQuery(
             new Query\MatchPhrasePrefix(
                 'item_collection.name',
-                'asfasfadsbrsertabwbtsd'
+                $search
             )
         );
+
         $collectionQuery->setQuery(
             new Query\MatchPhrasePrefix(
                 'item_collection.description',
-                'asfasfadsbrsertabwbtsd'
+                $search
             )
         );
 
@@ -49,17 +53,18 @@ class FindCollectionController extends AbstractController
         $categoryQuery->setQuery(
             new Query\MatchPhrasePrefix(
                 'item_collection.collection_category.name',
-                'asfasfadsbrsertabwbtsd'
+                $search
             )
         );
 
 
         $customAttributeQuery = new Nested();
+
         $customAttributeQuery->setPath('item_collection.custom_item_attributes');
         $customAttributeQuery->setQuery(
             new Query\MatchPhrasePrefix(
                 'item_collection.custom_item_attributes.name',
-                'asfasfadsbrsertabwbtsd'
+                $search
             )
         );
 
@@ -68,11 +73,11 @@ class FindCollectionController extends AbstractController
         $customAttributeValueQuery->setQuery(
             new Query\MatchPhrasePrefix(
                 'item_attribute_value.name',
-                'IDK'
+                $search
             )
         );
 
-        $nameQuery = new MatchPhrasePrefix('name', ';pl');
+        $nameQuery = new MatchPhrasePrefix('name', $search);
 
 
 

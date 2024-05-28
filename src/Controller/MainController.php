@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Item;
 use App\Entity\ItemsCollection;
+use App\Entity\ItemTag;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,21 +23,17 @@ class MainController extends AbstractController
     public function index(): Response
     {
         $items = $this->entityManager->getRepository(Item::class)->findLastFive();
-        $itemCollectionData = [];
-        $lastFiveItems = [];
 
-        foreach ($items as $item) {
-            $itemCollection = $this->entityManager->getRepository(ItemsCollection::class)->find($item->getItemCollection()->getId());
-            $itemCollectionData['id'] = $item->getId();
-            $itemCollectionData['author'] = $itemCollection->getUser()->getEmail();
-            $itemCollectionData['collection'] = $itemCollection->getName();
-            $itemCollectionData['item'] = $item->getName();
-            $lastFiveItems[] = $itemCollectionData;
-        }
+        $biggestCollection = $this->entityManager->getRepository(ItemsCollection::class)->findTopFiveCollections();
+
+
+        $tags = $this->entityManager->getRepository(ItemTag::class)->findAll();
 
         return $this->render('main/index.html.twig', [
             'controller_name' => 'MainController',
-            'items' => $lastFiveItems,
+            'items' => $items,
+            'collections' => $biggestCollection,
+            'tags' => $tags,
         ]);
     }
 }

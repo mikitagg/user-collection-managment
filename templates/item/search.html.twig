@@ -3,6 +3,8 @@
 {% block title %}users{% endblock %}
 
 {% block body %}
+    {% include 'header.html.twig' %}
+
    {% for item in items %}
     <a href = '/item/{{ item }}'>founded item</a>
     {% endfor %}
