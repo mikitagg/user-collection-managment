@@ -42,9 +42,8 @@ COPY --from=elasticsearch /usr/share/elasticsearch /usr/share/elasticsearch
 
 #RUN php bin/console doctrine:migrations:migrate
 
-RUN php bin/console fos:elastica:populate
 
 CMD ["nginx", "-g", "daemon off;"]
 
-
+RUN php bin/console fos:elastica:populate
 
