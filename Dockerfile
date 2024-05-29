@@ -32,6 +32,8 @@ EXPOSE 80 9000
 
 FROM elasticsearch:7.17.1 AS elasticsearch
 
+HEALTHCHECK --interval=5s --timeout=3s --retries=3 CMD ["/usr/share/elasticsearch/bin/elasticsearch", "--version"]
+
 EXPOSE 9200 9300
 
 CMD ["elasticsearch"]
