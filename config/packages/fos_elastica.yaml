@@ -1,39 +1,39 @@
 # Read the documentation: https://github.com/FriendsOfSymfony/FOSElasticaBundle/blob/master/doc/setup.md
-fos_elastica:
-    clients:
-        default: { url: '%env(ELASTICSEARCH_URL)%' }
-    indexes:
-        items:
-            properties:
-                item_collection:
-                    type: nested
-                    properties:
-                        name: { type: text }
-                        description: { type: text }
-                        user:
-                            type: nested
-                            properties:
-                                email: { type: text }
-                        collection_category:
-                            type: nested
-                            properties:
-                                name: { type: text }
-                        custom_item_attributes:
-                            type: nested
-                            properties:
-                                name: { type: text}
-                name: { type: text }
-                item_attribute_value:
-                    type: nested
-                    properties:
-                        name: { type: text }
-
-            persistence:
-                driver: orm
-                finder: ~
-                model: App\Entity\Item
-
-
+#fos_elastica:
+#    clients:
+#        default: { url: '%env(ELASTICSEARCH_URL)%' }
+#    indexes:
+#        items:
+#            properties:
+#                item_collection:
+#                    type: nested
+#                    properties:
+#                        name: { type: text }
+#                        description: { type: text }
+#                        user:
+#                            type: nested
+#                            properties:
+#                                email: { type: text }
+#                        collection_category:
+#                            type: nested
+#                            properties:
+#                                name: { type: text }
+#                        custom_item_attributes:
+#                            type: nested
+#                            properties:
+#                                name: { type: text}
+#                name: { type: text }
+#                item_attribute_value:
+#                    type: nested
+#                    properties:
+#                        name: { type: text }
+#
+#            persistence:
+#                driver: orm
+#                finder: ~
+#                model: App\Entity\Item
+#
+#
 
 #                collection_category_id:
 #                    type: integer
