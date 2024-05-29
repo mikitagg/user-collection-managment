@@ -6,15 +6,15 @@
 {% block body %}
     {% include 'header.html.twig' %}
 
-    <h4>Name: {{ name }}</h4>
+    <h4>Name: {{ items.name }}</h4>
     <h4>Attributes</h4>
     <div>
     <table id="myTable" class="table">
             <tbody>
-            {% for item in attributes %}
+            {% for item in items.itemAttributeValue %}
                 <tr>
-                    <td>{{ item.attribute }}</td>
-                    <td>{{ item.value }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.customItemAttribute.name }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -24,23 +24,69 @@
 
     <div class="comments">
         <h2>Comments</h2>
-        {% if comments %}
-            <ul>
-                {% for comment in comments %}
-                    <div>
+        <ul id="comment-list">
+            {% if items.comments %}
+                {% for comment in items.comments %}
+                    <div data-comment-id="{{ comment.id }}">
                         <small> {{ comment.username.email }}</small>
                         <span> {{ comment.content }}</span>
                     </div>
                 {% endfor %}
-            </ul>
-        {% else %}
-            <p>No comments yet.</p>
-        {% endif %}
+            {% else %}
+                <li>No comments yet.</li>
+            {% endif %}
+        </ul>
 
         <h3>Add a Comment</h3>
-            {{ form_start(comment_form) }}
-            {{ form_widget(comment_form.content) }}
-        <button type="submit">Submit</button>
+        {{ form_start(comment_form) }}
+            {{ form_widget(comment_form) }}
+        <button type="submit" class="btn btn-primary">Comment</button>
         {{ form_end(comment_form) }}
     </div>
+
+
+{% endblock %}
+{% block javascripts %}
+<script>
+    const commentForm = document.getElementById('comment-form');
+    const commentList = document.getElementById('comment-list');
+    const submitButton = document.getElementById('submit-comment');
+
+    submitButton.addEventListener('click', function(event) {
+        event.preventDefault();
+
+        const content = document.getElementById('content').value;
+
+        fetch({{ path('app_item_comments', { 'id': items.id}) }}, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ content: content })
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Something went wrong!');
+                }
+            })
+            .then(data => {
+                const newComment = document.createElement('div');
+                newComment.dataset.commentId = data.id;
+                newComment.innerHTML = `
+                    <small> ${data.username.email}</small>
+                    <span> ${data.content}</span>
+            `;
+
+                commentList.appendChild(newComment);
+
+                document.getElementById('content').value = '';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    });
+</script>
 {% endblock %}

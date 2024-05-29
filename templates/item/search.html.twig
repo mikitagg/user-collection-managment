@@ -4,8 +4,11 @@
 
 {% block body %}
     {% include 'header.html.twig' %}
-
-   {% for item in items %}
-    <a href = '/item/{{ item }}'>founded item</a>
-    {% endfor %}
+    {% if items %}
+       {% for item in items %}
+            <a href = '/item/{{ item }}'>founded item</a>
+        {% endfor %}
+    {% else %}
+        <span>No results</span>
+    {% endif %}
 {% endblock %}

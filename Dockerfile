@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.2-fpm as php-app
 
 RUN apt-get update && apt-get install -y \
         nginx \
@@ -30,12 +30,24 @@ RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
 
 EXPOSE 80 9000
 
-CMD php-fpm -D && nginx -g 'daemon off;'
+FROM elasticsearch:7.17.1 AS elasticsearch
+
+COPY elasticsearch.yml /etc/elasticsearch/
+
+EXPOSE 9200 9300
+
+CMD ["elasticsearch"]
+
+FROM php-app
+
+COPY --from=elasticsearch /usr/share/elasticsearch /usr/share/elasticsearch
 
 RUN php bin/console doctrine:migrations:migrate
 
-RUN docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.17.1
+RUN php bin/console fos:elastica:populate
 
-RUN bin/console fos:elastica:populate
+CMD ["nginx", "-g", "daemon off;"]
+
+#RUN php bin/console doctrine:migrations:migrate
 
 

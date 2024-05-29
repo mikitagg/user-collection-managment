@@ -5,17 +5,14 @@ namespace App\Controller;
 use App\Entity\Comments;
 use App\Entity\Item;
 use App\Entity\ItemsCollection;
-use App\Entity\ItemTag;
 use App\Form\CommentType;
-use App\Form\ItemEditType;
 use App\Form\ItemType;
 use App\Repository\ItemRepository;
-use App\Repository\ItemsCollectionRepository;
-use App\Repository\ItemTagRepository;
 use App\Service\CommentService;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -47,6 +44,8 @@ class ItemController extends AbstractController
             $item = $form->getData();
             $this->entityManager->persist($item);
             $this->entityManager->flush();
+
+
         }
 
         return $this->render('item/form.html.twig', [
@@ -76,9 +75,8 @@ class ItemController extends AbstractController
     public function showCollectionItems(Request $request, ItemRepository $repository): Response
     {
 
-        $collection = $repository->find($request->get('id'));
-
-        $items = $repository->findBy(['itemCollection' => $collection]);
+        $collectionId = $request->get('id');
+        $items = $repository->findBy(['itemCollection' => $collectionId]);
 
         $pagination = $this->paginator->paginate(
             $items,
@@ -89,6 +87,7 @@ class ItemController extends AbstractController
         return $this->render('item/table.html.twig', [
             'controller_name' => 'ItemController',
             'pagination' => $pagination,
+            'collection' => $collectionId
         ]);
     }
 
@@ -96,40 +95,52 @@ class ItemController extends AbstractController
     #[Route('/{id}', name: 'app_item_id',  methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function showItem(Request $request, Item $item, CommentService $commentService): Response
     {
-
-        $itemName = $item->getName();
-        $attributes = [];
-
         $items = $this->entityManager->getRepository(Item::class)->findItemAttributes($item->getId());
 
-        foreach ($items->getItemAttributeValue() as $attributeValue) {
-            $attribute['attribute'] = $attributeValue->getCustomItemAttribute()->getName();
-            $attribute['value'] = $attributeValue->getName();
-            $attributes[] = $attribute;
-        }
+        $comments = $commentService->initializeComment($this->getUser(), $item);
 
-        $comments = $this->entityManager->getRepository(Comments::class)->findCommentsByItemId($item->getId());
-
-
-        $comment = $commentService->initializeComment($this->getUser(), $item);
-
-        $commentForm = $this->createForm(CommentType::class, $comment);
+        $commentForm = $this->createForm(CommentType::class, $comments);
         $commentForm->handleRequest($request);
 
         if($commentForm->isSubmitted() && $commentForm->isValid()) {
-            $this->entityManager->persist($comment);
+
+            $this->entityManager->persist($comments);
             $this->entityManager->flush();
         }
 
         return $this->render('item/show.html.twig', [
             'controller_name' => 'ItemController',
-            'attributes' => $attributes,
-            'name' => $itemName,
+            'items' => $items,
             'comment_form' => $commentForm->createView(),
-//            'tags' => $tagsArr,
-            'comments' => $comments,
         ]);
     }
+
+    #[Route('/{id}/comments', name: 'app_item_comments',  methods: [Request::METHOD_GET, Request::METHOD_POST])]
+    public function comments(Item $item): JsonResponse
+    {
+        $comments = $this->entityManager->getRepository(Comments::class)->findBy(['item' => $item->getId()]);
+
+        $responseData = array_map(function ($comment) {
+            return [
+                'id' => $comment['id'],
+                'content' => $comment['content'],
+                'username' => $comment['username'],
+            ];
+        }, $comments);
+
+        return new JsonResponse($responseData);
+    }
+
+    #[Route('/{id}/delete', name: 'app_item_delete', methods: ['GET', 'POST'])]
+    public function delete( EntityManagerInterface $entityManager, Item $item): Response
+    {
+
+        $entityManager->remove($item);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_item_collection', ['id' => $item->getItemCollection()->getId()]);
+    }
+
 
 
 }
