@@ -32,8 +32,6 @@ EXPOSE 80 9000
 
 FROM elasticsearch:7.17.1 AS elasticsearch
 
-COPY elasticsearch.yml /etc/elasticsearch/
-
 EXPOSE 9200 9300
 
 CMD ["elasticsearch"]
@@ -42,12 +40,11 @@ FROM php-app
 
 COPY --from=elasticsearch /usr/share/elasticsearch /usr/share/elasticsearch
 
-RUN php bin/console doctrine:migrations:migrate
+#RUN php bin/console doctrine:migrations:migrate
 
 RUN php bin/console fos:elastica:populate
 
 CMD ["nginx", "-g", "daemon off;"]
 
-#RUN php bin/console doctrine:migrations:migrate
 
 
