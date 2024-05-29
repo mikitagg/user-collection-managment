@@ -35,6 +35,10 @@ FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.1
 
 COPY elasticsearch-plugin-*.zip /usr/share/elasticsearch/plugins/
 
+COPY wait-for-elasticsearch.sh /wait-for-elasticsearch.sh
+RUN chmod +x /wait-for-elasticsearch.sh
+
+
 CMD ["sh", "/wait-for-elasticsearch.sh", "elasticsearch", "localhost", "9200", "30", "php-fpm", "-D", "nginx", "-g", "daemon off;"]
 
 
