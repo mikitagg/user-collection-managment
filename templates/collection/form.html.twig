@@ -4,6 +4,7 @@
 
 {% block body %}
     {% include 'header.html.twig' %}
+
     <div class="container mt-5">
         <form method="post" enctype="multipart/form-data">
             {{ form_start(form, {'attr': {'class': 'row g-3'}, 'enctype': 'multipart/form-data'}) }}
@@ -39,9 +40,7 @@
                         </div>
                     {% endfor %}
                 </div>
-                <button id="add-custom-attribute" type="button" class="btn btn-outline-success" style="margin-top: 5px">
-                    {{ 'add' }}
-                </button>
+                    <button id="add-custom-attribute" type="button" class="btn btn-outline-success" style="margin-top: 5px">add</button>
             </div>
 
             {{ form_rest(form) }}
@@ -52,4 +51,5 @@
         </form>
     </div>
     <script type="application/javascript" src="{{ asset('js/collection-form-helper.js') }}"></script>
+
 {% endblock %}

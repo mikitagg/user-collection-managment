@@ -1,4 +1,4 @@
-FROM php:8.2-fpm as php-app
+FROM php:8.2-fpm
 
 RUN apt-get update && apt-get install -y \
         nginx \
@@ -30,17 +30,6 @@ RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
 
 EXPOSE 80 9000
 
+CMD php-fpm -D && nginx -g 'daemon off;'
 
-FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.1
-
-COPY elasticsearch-plugin-*.zip /usr/share/elasticsearch/plugins/
-
-COPY wait-for-elasticsearch.sh /wait-for-elasticsearch.sh
-RUN chmod +x /wait-for-elasticsearch.sh
-
-
-CMD ["sh", "/wait-for-elasticsearch.sh", "elasticsearch", "localhost", "9200", "30", "php-fpm", "-D", "nginx", "-g", "daemon off;"]
-
-
-
-RUN #php bin/console fos:elastica:populate
+#RUN php bin/console doctrine:migrations:migrate

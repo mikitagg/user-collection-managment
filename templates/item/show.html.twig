@@ -6,44 +6,45 @@
 {% block body %}
     {% include 'header.html.twig' %}
 
-    <h4>Name: {{ items.name }}</h4>
-    <h4>Attributes</h4>
-    <div>
-    <table id="myTable" class="table">
-            <tbody>
-            {% for item in items.itemAttributeValue %}
-                <tr>
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.customItemAttribute.name }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-
-    <div class="comments">
-        <h2>Comments</h2>
-        <ul id="comment-list">
-            {% if items.comments %}
-                {% for comment in items.comments %}
-                    <div data-comment-id="{{ comment.id }}">
-                        <small> {{ comment.username.email }}</small>
-                        <span> {{ comment.content }}</span>
-                    </div>
+    <div class="container">
+        <h4>Name: {{ items.name }}</h4>
+        <h4>Attributes</h4>
+        <div>
+        <table id="myTable" class="table">
+                <tbody>
+                {% for item in items.itemAttributeValue %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.customItemAttribute.name }}</td>
+                    </tr>
                 {% endfor %}
-            {% else %}
-                <li>No comments yet.</li>
-            {% endif %}
-        </ul>
+                </tbody>
+            </table>
+        </div>
 
-        <h3>Add a Comment</h3>
-        {{ form_start(comment_form) }}
-            {{ form_widget(comment_form) }}
-        <button type="submit" class="btn btn-primary">Comment</button>
-        {{ form_end(comment_form) }}
+
+        <div class="comments container">
+            <h2>Comments</h2>
+            <ul id="comment-list">
+                {% if items.comments %}
+                    {% for comment in items.comments %}
+                        <div data-comment-id="{{ comment.id }}">
+                            <small> {{ comment.username.email }} - </small>
+                            <span> {{ comment.content }}</span>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <li>No comments yet.</li>
+                {% endif %}
+            </ul>
+
+            <h3>Add a Comment</h3>
+            {{ form_start(comment_form) }}
+                {{ form_widget(comment_form) }}
+            <button type="submit" class="btn btn-primary">Comment</button>
+            {{ form_end(comment_form) }}
+        </div>
     </div>
-
 
 {% endblock %}
 {% block javascripts %}

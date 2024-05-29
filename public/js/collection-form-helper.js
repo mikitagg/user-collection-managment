@@ -36,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () =>{
         .querySelector('#add-custom-attribute')
         .addEventListener('click', (e) =>{
             e.preventDefault();
-
             addCollectionAttribute();
         })
 

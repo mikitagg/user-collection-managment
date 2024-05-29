@@ -11,20 +11,22 @@
         <div class="example-wrapper col-sm">
             <h2>Last 5 items:</h2>
             {% for item in items %}
-                    <div class="last-items">
-                        <div class="card shadow-0 border" style="background-color: #f0f2f5;">
-                            <small>Item name:</small><span>  {{ item.name }} </span>
-                            <small>Created by: </small> <span> {{ item.itemCollection.user.email }}</span>
-                            <small>Collection:</small><span> {{ item.ItemCollection.name }}</span>
-                        </div>
+                    <div class="last-items m-1">
+                        <a href="{{ path('app_item_id', {'id': item.id}) }}">
+                            <div class="card shadow-0 border container" style="background-color: #f0f2f5;">
+                                <small>Item name:</small><span>  {{ item.name }} </span>
+                                <small>Created by: </small> <span> {{ item.itemCollection.user.email }}</span>
+                                <small>Collection:</small><span> {{ item.ItemCollection.name }}</span>
+                            </div>
+                        </a>
                     </div>
             {% endfor %}
         </div>
         <div class="example-wrapper col-sm">
             <h2>Biggest collections:</h2>
             {% for collection in collections %}
-                <div class="biggest-collections">
-                    <div class="card shadow-0 border" style="background-color: #f0f2f5;">
+                <div class="biggest-collections m-1">
+                    <div class="card shadow-0 border container" style="background-color: #f0f2f5;">
                         <small>Collection:</small><span> {{ collection.0.name }} </span>
                         <small>Created by:</small><span> {{ collection.0.user.email }}</span>
                         <small>Items count:</small><span> {{ collection.itemCount }}</span>
@@ -33,10 +35,12 @@
             {% endfor %}
         </div>
 
-        <div class=" example-wrapper col-sm">
+        <div class=" example-wrapper col-sm ">
             <h2>Tags:</h2>
             {% for tag in tags %}
-                    <span class="badge bg-light text-dark">{{ tag.name }}</span>
+                <div class="card shadow-0 border container m-1" style="background-color: #f0f2f5;">
+                        <span class="badge bg-light text-dark">{{ tag.name }}</span>
+                </div>
             {% endfor %}
         </div>
     </div>
