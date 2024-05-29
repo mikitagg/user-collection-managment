@@ -36,7 +36,7 @@ HEALTHCHECK --interval=5s --timeout=3s --retries=3 CMD ["/usr/share/elasticsearc
 
 EXPOSE 9200 9300
 
-CMD ["elasticsearch"]
+CMD elasticsearch
 
 FROM php-app
 
@@ -48,7 +48,7 @@ RUN chmod +x /wait-for-elasticsearch.sh
 
 CMD ["sh", "/wait-for-elasticsearch.sh"]
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD php-fpm -D && nginx -g 'daemon off;'
 
 #RUN php bin/console doctrine:migrations:migrate
 
