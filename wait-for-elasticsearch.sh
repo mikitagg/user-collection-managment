@@ -21,5 +21,7 @@ while true; do
   fi
 done
 
+php bin/console fos:elastica:populate
+
 # Run your application after Elasticsearch is ready
 exec "$@"

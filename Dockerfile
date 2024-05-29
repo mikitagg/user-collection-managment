@@ -43,4 +43,4 @@ CMD ["sh", "/wait-for-elasticsearch.sh", "elasticsearch", "localhost", "9200", "
 
 
 
-RUN php bin/console fos:elastica:populate
+RUN #php bin/console fos:elastica:populate
