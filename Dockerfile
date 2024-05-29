@@ -49,6 +49,8 @@ RUN chmod +x /wait-for-elasticsearch.sh
 
 CMD ["sh", "/wait-for-elasticsearch.sh", "php-fpm", "-D", "nginx", "-g", "daemon off;"]
 
+COPY --from=php-app /var/www /var/www
+
 FROM php-app-final as php-app-populate
 
 RUN php bin/console fos:elastica:populate
