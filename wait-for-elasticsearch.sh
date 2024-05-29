@@ -1,6 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
-until curl -s http://localhost:9200 -o /dev/null -w '%{http_code}' | grep -q 200; do
-  echo "Waiting for Elasticsearch..."
-  sleep 1
+echo "Waiting for Elasticsearch to start..."
+while ! curl -s http://elasticsearch:9200/ >/dev/null; do
+    sleep 1
 done
+
+echo "Elasticsearch is up and running!"
+exec "$@"

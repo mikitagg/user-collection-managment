@@ -36,7 +36,8 @@ HEALTHCHECK --interval=5s --timeout=3s --retries=3 CMD ["/usr/share/elasticsearc
 
 EXPOSE 9200 9300
 
-CMD elasticsearch
+CMD ["elasticsearch"]
+
 
 FROM php-app as php-app-final
 
@@ -46,11 +47,8 @@ COPY wait-for-elasticsearch.sh /wait-for-elasticsearch.sh
 
 RUN chmod +x /wait-for-elasticsearch.sh
 
-ENTRYPOINT ["sh", "/wait-for-elasticsearch.sh"]
+CMD ["sh", "/wait-for-elasticsearch.sh", "php-fpm", "-D", "nginx", "-g", "daemon off;"]
 
-CMD ["php-fpm", "-D", "nginx", "-g", "daemon off;"]
-
-# Move the populate command to this new stage
 FROM php-app-final as php-app-populate
 
 RUN php bin/console fos:elastica:populate
