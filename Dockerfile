@@ -38,7 +38,7 @@ EXPOSE 9200 9300
 
 CMD elasticsearch
 
-FROM php-app
+FROM php-app as php-app-final
 
 COPY --from=elasticsearch /usr/share/elasticsearch /usr/share/elasticsearch
 
@@ -48,10 +48,9 @@ RUN chmod +x /wait-for-elasticsearch.sh
 
 ENTRYPOINT ["sh", "/wait-for-elasticsearch.sh"]
 
-CMD php-fpm -D && nginx -g 'daemon off;'
+CMD ["php-fpm", "-D", "nginx", "-g", "daemon off;"]
 
-#RUN php bin/console doctrine:migrations:migrate
-
+# Move the populate command to this new stage
+FROM php-app-final as php-app-populate
 
 RUN php bin/console fos:elastica:populate
-
