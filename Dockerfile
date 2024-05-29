@@ -42,14 +42,16 @@ FROM php-app
 
 COPY --from=elasticsearch /usr/share/elasticsearch /usr/share/elasticsearch
 
-#RUN php bin/console doctrine:migrations:migrate
-RUN chmod +x /wait-for-elasticsearch.sh
+COPY wait-for-elasticsearch.sh /wait-for-elasticsearch.sh
 
-ENTRYPOINT ["sh", "/wait-for-elasticsearch.sh"]
+RUN chmod +x /wait-for-elasticsearch.sh
 
 CMD ["sh", "/wait-for-elasticsearch.sh"]
 
 CMD ["nginx", "-g", "daemon off;"]
+
+#RUN php bin/console doctrine:migrations:migrate
+
 
 RUN php bin/console fos:elastica:populate
 
