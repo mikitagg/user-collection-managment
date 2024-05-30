@@ -9,7 +9,7 @@ class GoogleCloudStorageService
     private $storageClient;
     private $bucketName;
 
-    public function __construct(string $bucketName, string $projectId)
+    public function __construct(string $bucketName)
     {
         $this->storageClient = new StorageClient([
             'keyFilePath' => getenv('GOOGLE_APPLICATION_CREDENTIALS')
