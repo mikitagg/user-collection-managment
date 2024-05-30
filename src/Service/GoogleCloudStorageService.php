@@ -9,10 +9,10 @@ class GoogleCloudStorageService
     private $storageClient;
     private $bucketName;
 
-    public function __construct(string $bucketName)
+    public function __construct(string $bucketName, string $keyFilePath)
     {
         $this->storageClient = new StorageClient([
-            'keyFilePath' => '/etc/secrets/bold-column-424118-i9-9d1578163f20.json',
+            'keyFilePath' => $keyFilePath,
         ]);
         $this->bucketName = $bucketName;
     }

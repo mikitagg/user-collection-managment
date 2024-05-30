@@ -26,6 +26,7 @@ services:
     App\Service\GoogleCloudStorageService:
         arguments:
             $bucketName: '%env(GOOGLE_CLOUD_STORAGE_BUCKET)%'
+            $keyFilePath: '%env(GOOGLE_APPLICATION_CREDENTIALS)%'
 #    App\Controller\FindItemController:
 #        tags: [ 'controller.service_arguments' ]
 #        public: true
