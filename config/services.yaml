@@ -23,9 +23,9 @@ services:
             - '../src/Kernel.php'
 
 
-    App\Service\GoogleCloudStorageService:
-        arguments:
-            $bucketName: '%env(GOOGLE_CLOUD_STORAGE_BUCKET)%'
+#    App\Service\GoogleCloudStorageService:
+#        arguments:
+#            $bucketName: '%env(GOOGLE_CLOUD_STORAGE_BUCKET)%'
            # $keyFilePath: '%env(GOOGLE_CLOUD_KEY_FILE)%'
            # $projectId: '%env(GOOGLE_CLOUD_PROJECT_ID)%'
 #    App\Controller\FindItemController:

@@ -9,15 +9,13 @@ class GoogleCloudStorageService
     private $storageClient;
     private $bucketName;
 
-    public function __construct(string $bucketName)
+    public function __construct()
     {
         $this->storageClient = new StorageClient([
-            'keyFilePath' => getenv('GOOGLE_APPLICATION_CREDENTIALS')
+            'keyFilePath' => getenv('GOOGLE_APPLICATION_CREDENTIALS'),
         ]);
-        $this->bucketName = $bucketName;
-
+        $this->bucketName = 'mikitaimagebucket';
     }
-
     public function uploadImage($file, $fileName)
     {
         $bucket = $this->storageClient->bucket($this->bucketName);
