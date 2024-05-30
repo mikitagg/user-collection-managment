@@ -27,7 +27,7 @@ class GoogleCloudStorageService
             "universe_domain" => "googleapis.com"
         ];
 
-        dd($keyFile);
+        dd(getenv('GOOGLE_APPLICATION_CREDENTIALS'));
         $this->storageClient = new StorageClient([
             'projectId' => getenv('GOOGLE_CLOUD_PROJECT_ID'),
             'keyFile' => $keyFile,
