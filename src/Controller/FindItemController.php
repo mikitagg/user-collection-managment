@@ -90,8 +90,6 @@ class FindItemController extends AbstractController
         $query->setQuery($boolQuery);
 
 
-     //   $ans = $this->finder->find($query);
-
 
 
         $items = [];

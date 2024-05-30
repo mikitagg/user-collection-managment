@@ -17,7 +17,7 @@ class ImageUploadConroller extends AbstractController
     {
     }
 
-    #[Route("/upload", name: "upload")]
+    #[Route("/upload", name: "upload_image")]
     public function uploadImage(Request $request)
     {
         $form = $this->createForm(UploadType::class);
