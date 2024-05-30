@@ -9,6 +9,8 @@ class GoogleCloudStorageService
     private $storageClient;
     private $bucketName;
 
+
+
     public function __construct()
     {
         $this->storageClient = new StorageClient([
@@ -31,6 +33,8 @@ class GoogleCloudStorageService
     }
     public function uploadImage($file, $fileName)
     {
+
+        dd(getenv('GOOGLE_CLOUD_PRIVATE_KEY'));
         $bucket = $this->storageClient->bucket($this->bucketName);
         $object = $bucket->upload(
             fopen($file->getPathname(), 'r'),
