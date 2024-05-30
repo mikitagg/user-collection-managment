@@ -14,19 +14,20 @@ class GoogleCloudStorageService
     public function __construct()
     {
         $keyFile = [
-            "type"=> "service_account",
-            "project_id"=> getenv('GOOGLE_CLOUD_PROJECT_ID'),
-            "private_key_id"=> getenv('GOOGLE_CLOUD_PRIVATE_KEY_ID'),
-            "private_key"=> getenv('GOOGLE_CLOUD_PRIVATE_KEY'),
-            "client_email"=> "mikitabondarkou@bold-column-424118-i9.iam.gserviceaccount.com",
-            "client_id"=> getenv('GOOGLE_CLOUD_CLIENT_ID'),
-            "auth_uri"=> "https://accounts.google.com/o/oauth2/auth",
-            "token_uri"=> "https://oauth2.googleapis.com/token",
-            "auth_provider_x509_cert_url"=> getenv('GOOGLE_CLOUD_AUTH_PROVIDER'),
-            "client_x509_cert_url"=> getenv('GOOGLE_CLOUD_CERT_URL'),
-            "universe_domain"=> "googleapis.com"
+            "type" => "service_account",
+            "project_id" => getenv('GOOGLE_CLOUD_PROJECT_ID'),
+            "private_key_id" => getenv('GOOGLE_CLOUD_PRIVATE_KEY_ID'),
+            "private_key" => getenv('GOOGLE_CLOUD_PRIVATE_KEY'),
+            "client_email" => "mikitabondarkou@bold-column-424118-i9.iam.gserviceaccount.com",
+            "client_id" => getenv('GOOGLE_CLOUD_CLIENT_ID'),
+            "auth_uri" => "https://accounts.google.com/o/oauth2/auth",
+            "token_uri" => "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url" => getenv('GOOGLE_CLOUD_AUTH_PROVIDER'),
+            "client_x509_cert_url" => getenv('GOOGLE_CLOUD_CERT_URL'),
+            "universe_domain" => "googleapis.com"
         ];
 
+        dd($keyFile);
         $this->storageClient = new StorageClient([
             'projectId' => getenv('GOOGLE_CLOUD_PROJECT_ID'),
             'keyFile' => $keyFile,
