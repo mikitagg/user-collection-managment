@@ -12,7 +12,8 @@ class GoogleCloudStorageService
     public function __construct()
     {
         $this->storageClient = new StorageClient([
-            'keyFilePath' => getenv('GOOGLE_APPLICATION_CREDENTIALS'),
+            'projectId' => getenv('GOOGLE_CLOUD_PROJECT_ID'),
+            'key' => getenv('GOOGLE_CLOUD_PRIVATE_KEY'),
         ]);
         $this->bucketName = 'mikitaimagebucket';
     }
