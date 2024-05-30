@@ -18,7 +18,6 @@ class GoogleCloudStorageService
     }
     public function uploadImage($file, $fileName)
     {
-        dd(getenv('GOOGLE_APPLICATION_CREDENTIALS'));
         $bucket = $this->storageClient->bucket($this->bucketName);
         $object = $bucket->upload(
             fopen($file->getPathname(), 'r'),
