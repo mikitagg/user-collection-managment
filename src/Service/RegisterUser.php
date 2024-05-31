@@ -26,7 +26,7 @@ class RegisterUser
                 $form->get('plainPassword')->getData()
             )
         );
-        $user->setRoles(['ROLE_ADMIN']);
+        $user->setRoles(['ROLE_USER']);
 //        $user->setStatus('Active');
         $this->entityManager->persist($user);
         $this->entityManager->flush();

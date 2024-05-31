@@ -22,7 +22,7 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-
+# ... other services ...
 #    App\Service\GoogleCloudStorageService:
 #        arguments:
 #            $bucketName: '%env(GOOGLE_CLOUD_STORAGE_BUCKET)%'

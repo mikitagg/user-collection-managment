@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\ItemAttributeValue;
 use App\Entity\ItemsCollection;
 use App\Form\CollectionType;
 use App\Repository\ItemsCollectionRepository;
@@ -32,14 +31,12 @@ class CollectionController extends AbstractController
         $itemsCollection->setUser($this->getUser());
         $form = $this->createForm(CollectionType::class, $itemsCollection);
         $form->handleRequest($request);
-
         if ($form->isSubmitted() && $form->isValid()) {
             $collection = $form->getData();
             $this->entityManager->persist($collection);
             $this->entityManager->flush();
-            $this->addFlash('success', 'Collection created.');
+            return $this->redirectToRoute('app_collection_show_user', ['id' => $collection->getUser()->getId()]);
         }
-
         return $this->render('collection/form.html.twig', [
             'action' => 'create',
             'form' => $form->createView(),
@@ -51,16 +48,12 @@ class CollectionController extends AbstractController
     #[IsGranted('edit', 'collection', 'You have no permission to update this collection', 404)]
     public function update(Request $request, ItemsCollection $collection): Response
     {
-
         $form = $this->createForm(CollectionType::class, $collection);
         $form->handleRequest($request);
-
         if($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->flush();
-
-            $this->addFlash('success', 'Collection successfully updated');
+            return $this->redirectToRoute('app_collection_show_user', ['id' => $collection->getUser()->getId()]);
         }
-
         return $this->render('collection/form.html.twig', [
             'action' => 'update',
             'form' => $form->createView(),
@@ -68,19 +61,15 @@ class CollectionController extends AbstractController
         ]);
     }
 
-
-
     #[Route('/show/all', name: 'app_collection_show_all', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function showAllCollections(Request $request, ItemsCollectionRepository $itemsCollectionRepository): Response
     {
         $query = $itemsCollectionRepository->getItemCollectionWithAuthorAndCategory();
-
         $pagination = $this->paginator->paginate(
             $query,
             $request->query->getInt('page', 1),
             $request->query->getInt('limit',  20)
         );
-
         return $this->render('collection/showall.html.twig', [
             'action' => 'create',
             'pagination' => $pagination,
@@ -92,27 +81,23 @@ class CollectionController extends AbstractController
     public function showUserCollections(Request $request, ItemsCollectionRepository $itemsCollectionRepository): Response
     {
         $user_id = $request->get('id');
-
         $userItemCollections = $itemsCollectionRepository->getItemCollectionWithCategories($user_id);
-
         $pagination = $this->paginator->paginate(
             $userItemCollections,
             $request->query->getInt('page', 1),
             $request->query->getInt('limit',  20)
         );
-
         return $this->render('collection/show_user_collection.html.twig', [
             'pagination' => $pagination,
         ]);
     }
 
     #[Route('/{id}/delete', name: 'app_collection_delete', methods: ['GET', 'POST'])]
+    #[IsGranted('edit', 'collection', 'You have no permission to delete this collection', 404)]
     public function delete(Request $request, EntityManagerInterface $entityManager, ItemsCollection $collection): Response
     {
-
         $entityManager->remove($collection);
         $entityManager->flush();
-
         return $this->redirectToRoute('app_collection_show_user', ['id' => $this->getUser()->getId()]);
     }
 

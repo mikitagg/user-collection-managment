@@ -30,7 +30,6 @@ class ImageUploadConroller extends AbstractController
             $this->addFlash('success', 'Image uploaded successfully!');
 
         }
-
         return $this->render('upload/upload.html.twig', [
             'form' => $form->createView(),
         ]);

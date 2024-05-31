@@ -16,8 +16,7 @@ class MainController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
     )
-    {
-    }
+    {}
 
     #[Route('/main', name: 'app_main')]
     public function index(): Response
@@ -25,7 +24,6 @@ class MainController extends AbstractController
         $items = $this->entityManager->getRepository(Item::class)->findLastFive();
 
         $biggestCollection = $this->entityManager->getRepository(ItemsCollection::class)->findTopFiveCollections();
-
 
         $tags = $this->entityManager->getRepository(ItemTag::class)->findAll();
 

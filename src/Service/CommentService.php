@@ -9,9 +9,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class CommentService
 {
-
-
-    public function initializeComment(User $user, Item $item): Comments
+    public function initializeComment(?User $user, Item $item): Comments
     {
         $comment = new Comments();
         $comment->setItem($item);

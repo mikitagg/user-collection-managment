@@ -24,7 +24,7 @@
 
 
         <div class="comments container">
-            <h2>Comments</h2>
+            <h4>Comments</h4>
             <ul id="comment-list">
                 {% if items.comments %}
                     {% for comment in items.comments %}
@@ -38,11 +38,15 @@
                 {% endif %}
             </ul>
 
-            <h3>Add a Comment</h3>
-            {{ form_start(comment_form) }}
-                {{ form_widget(comment_form) }}
-            <button type="submit" class="btn btn-primary">Comment</button>
-            {{ form_end(comment_form) }}
+            <h4>Add a Comment</h4>
+            {% if(app.user) %}
+                {{ form_start(comment_form) }}
+                    {{ form_widget(comment_form) }}
+                <button type="submit" class="btn btn-primary">Comment</button>
+                {{ form_end(comment_form) }}
+            {% else %}
+                <h4>Please sign in to comment</h4>
+            {% endif %}
         </div>
     </div>
 

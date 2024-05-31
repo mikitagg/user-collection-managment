@@ -16,7 +16,6 @@ class ItemTagRepository extends ServiceEntityRepository
         parent::__construct($registry, ItemTag::class);
     }
 
-
         public function findByQuery($query): array
         {
             return $this->createQueryBuilder('t')
@@ -26,14 +25,4 @@ class ItemTagRepository extends ServiceEntityRepository
                 ->getResult()
                 ;
         }
-
-    //    public function findOneBySomeField($value): ?ItemTag
-    //    {
-    //        return $this->createQueryBuilder('i')
-    //            ->andWhere('i.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

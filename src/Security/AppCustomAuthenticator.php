@@ -34,18 +34,18 @@ class AppCustomAuthenticator extends AbstractLoginFormAuthenticator
 
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
 
-//        $userBadge = new UserBadge($email, function ($userIdentifier) {
-//            $user = $this->userProvider->loadUserByIdentifier($userIdentifier);
-//
-//            if ($user->getStatus()->name === "Blocked") {
-//                throw new CustomUserMessageAuthenticationException('You have been blocked.');
-//            }
-//
-//            return $user;
-//        });
+        $userBadge = new UserBadge($email, function ($userIdentifier) {
+            $user = $this->userProvider->loadUserByIdentifier($userIdentifier);
+
+            if ($user->getStatus()->name === "Blocked") {
+                throw new CustomUserMessageAuthenticationException('You have been blocked.');
+            }
+
+            return $user;
+        });
 
         return new Passport(
-            new UserBadge($email),
+            $userBadge,
             new PasswordCredentials($request->getPayload()->getString('password')),
             [
                 new CsrfTokenBadge('authenticate', $request->getPayload()->getString('_csrf_token')),
@@ -60,9 +60,8 @@ class AppCustomAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($targetPath);
         }
 
-        // For example:
          return new RedirectResponse($this->urlGenerator->generate('app_main'));
-        //throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
+
     }
 
     protected function getLoginUrl(Request $request): string

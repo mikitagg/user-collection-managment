@@ -39,9 +39,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Type(type: UserStatus::class)]
     private ?UserStatus $status;
 
-    /**
-     * @var Collection<int, Comments>
-     */
     #[ORM\OneToMany(targetEntity: Comments::class, mappedBy: 'username')]
     private Collection $comments;
 
@@ -71,21 +68,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
     }
 
-    /**
-     * @see UserInterface
-     *
-     * @return list<string>
-     */
+
     public function getRoles(): array
     {
         $roles = $this->roles;
@@ -94,9 +82,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique($roles);
     }
 
-    /**
-     * @param list<string> $roles
-     */
+
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
@@ -104,9 +90,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
+
     public function getPassword(): string
     {
         return $this->password;
@@ -157,9 +141,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     }
 
-    /**
-     * @return Collection<int, Comments>
-     */
     public function getComments(): Collection
     {
         return $this->comments;
@@ -178,7 +159,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeComment(Comments $comment): static
     {
         if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
             if ($comment->getUsername() === $this) {
                 $comment->setUsername(null);
             }

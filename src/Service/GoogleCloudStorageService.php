@@ -9,31 +9,27 @@ class GoogleCloudStorageService
     private $storageClient;
     private $bucketName;
 
-
-
     public function __construct()
     {
-
         $keyFile = [
-            "type" => "service_account",
-            "project_id" => "bold-column-424118-i9",
-            "private_key_id" => "9d1578163f205c447c12047b8e8782f27822f8cb",
-            "private_key" => str_replace("\n", "", getenv('GOOGLE_CLOUD_PRIVATE_KEY')),
-            "client_email" => "mikitabondarkou@bold-column-424118-i9.iam.gserviceaccount.com",
-            "client_id" => "101092736103622014913",
-            "auth_uri" => "https://accounts.google.com/o/oauth2/auth",
-            "token_uri" => "https://oauth2.googleapis.com/token",
-            "auth_provider_x509_cert_url" => "https://www.googleapis.com/oauth2/v1/certs",
-            "client_x509_cert_url" => "https://www.googleapis.com/robot/v1/metadata/x509/mikitabondarkou%40bold-column-424118-i9.iam.gserviceaccount.com",
-            "universe_domain" => "googleapis.com"
+            "type"=> "service_account",
+            "project_id"=> getenv('GOOGLE_CLOUD_PROJECT_ID'),
+            "private_key_id"=> getenv('GOOGLE_CLOUD_PRIVATE_KEY_ID'),
+            "private_key"=> getenv('GOOGLE_CLOUD_PRIVATE_KEY'),
+            "client_email"=> getenv('GOOGLE_CLOUD_CLIENT_EMAIL'),
+            "client_id"=> getenv('GOOGLE_CLOUD_CLIENT_ID'),
+            "auth_uri"=> getenv('GOOGLE_CLOUD_AUTH_URI'),
+            "token_uri"=> getenv('GOOGLE_CLOUD_TOKEN_URI'),
+            "auth_provider_x509_cert_url"=> getenv('GOOGLE_CLOUD_AUTH_PROVIDER'),
+            "client_x509_cert_url"=> getenv('GOOGLE_CLOUD_CERT_URL'),
+            "universe_domain"=> "googleapis.com"
         ];
 
         $this->storageClient = new StorageClient([
-            'projectId' => "bold-column-424118-i9",
+            'projectId' => getenv('GOOGLE_CLOUD_PROJECT_ID'),
             'keyFile' => $keyFile,
         ]);
-
-        $this->bucketName = "mikitaimagebucket";
+        $this->bucketName = getenv('GOOGLE_CLOUD_STORAGE_BUCKET');
     }
     public function uploadImage($file, $fileName)
     {

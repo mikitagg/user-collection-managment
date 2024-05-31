@@ -46,9 +46,6 @@ class CollectionCategory
         return $this;
     }
 
-    /**
-     * @return Collection<int, ItemsCollection>
-     */
     public function getItemsCollection(): Collection
     {
         return $this->itemCollection;

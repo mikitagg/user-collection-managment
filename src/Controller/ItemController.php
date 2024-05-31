@@ -8,6 +8,7 @@ use App\Entity\ItemsCollection;
 use App\Form\CommentType;
 use App\Form\ItemType;
 use App\Repository\ItemRepository;
+use App\Repository\ItemsCollectionRepository;
 use App\Service\CommentService;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
@@ -25,17 +26,16 @@ class ItemController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly Security $security,
-        private readonly PaginatorInterface $paginator
+        private readonly PaginatorInterface $paginator,
     )
     {
     }
 
     #[Route('/{id}/create', name: 'item_create')]
-    public function create(Request $request, EntityManagerInterface $entityManager): Response
+    public function create(Request $request, EntityManagerInterface $entityManager, ItemsCollectionRepository $itemsCollectionRepository): Response
     {
-        $id = $request->get('id');
         $item = new Item();
-        $item->setItemCollection($entityManager->getRepository(ItemsCollection::class)->findWithCustomAttributes($id));
+        $item->setItemCollection($itemsCollectionRepository->findWithCustomAttributes($request->get('id')));
         $form = $this->createForm(ItemType::class, $item);
 
         $form->handleRequest($request);
@@ -44,8 +44,7 @@ class ItemController extends AbstractController
             $item = $form->getData();
             $this->entityManager->persist($item);
             $this->entityManager->flush();
-
-
+            return $this->redirectToRoute('app_item_collection', ['id' => $item->getItemCollection()->getId()]);
         }
 
         return $this->render('item/form.html.twig', [
@@ -56,18 +55,17 @@ class ItemController extends AbstractController
     #[Route('/{id}/update', name: 'app_item_update', methods: [Request::METHOD_GET, Request::METHOD_POST])]
     public function update(Request $request, Item $item): Response
     {
-        $collectionName = $item->getItemCollection()->getName();
         $form = $this->createForm(ItemType::class, $item);
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->flush();
-            $this->addFlash('success', 'Collection successfully updated');
+            return $this->redirectToRoute('app_item_id', ['id' => $item->getId()]);
         }
 
         return $this->render('item/form.html.twig', [
             'item_form' => $form->createView(),
-            'item_name' => $collectionName,
+            'item_name' => $item->getItemCollection()->getName(),
         ]);
     }
 
@@ -93,9 +91,10 @@ class ItemController extends AbstractController
 
 
     #[Route('/{id}', name: 'app_item_id',  methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    public function showItem(Request $request, Item $item, CommentService $commentService): Response
+    public function showItem(Request $request, Item $item, CommentService $commentService, ItemRepository $repository): Response
     {
-        $items = $this->entityManager->getRepository(Item::class)->findItemAttributes($item->getId());
+        $items = $repository->findItemAttributes($item->getId());
+
 
         $comments = $commentService->initializeComment($this->getUser(), $item);
 
@@ -103,7 +102,6 @@ class ItemController extends AbstractController
         $commentForm->handleRequest($request);
 
         if($commentForm->isSubmitted() && $commentForm->isValid()) {
-
             $this->entityManager->persist($comments);
             $this->entityManager->flush();
         }
@@ -134,10 +132,8 @@ class ItemController extends AbstractController
     #[Route('/{id}/delete', name: 'app_item_delete', methods: ['GET', 'POST'])]
     public function delete( EntityManagerInterface $entityManager, Item $item): Response
     {
-
         $entityManager->remove($item);
         $entityManager->flush();
-
         return $this->redirectToRoute('app_item_collection', ['id' => $item->getItemCollection()->getId()]);
     }
 

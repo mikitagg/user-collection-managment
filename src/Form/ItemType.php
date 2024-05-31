@@ -20,14 +20,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ItemType extends AbstractType
 {
-
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly TagTransformer $tagTransformer,
     )
     {
-
     }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
