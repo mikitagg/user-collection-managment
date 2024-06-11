@@ -4,6 +4,7 @@ namespace App\Service;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use JiraRestApi\JiraException;
 use Symfony\Bundle\SecurityBundle\Security;
 
 class JiraService
@@ -17,15 +18,18 @@ class JiraService
             'base_uri' => getenv('BASE_URI'),
             'auth' => ['n21601201@gmail.com', getenv('AUTH_TOKEN')],
         ]);
-
-
     }
 
     public function getUserIssues($user): array
     {
-        $response = $this->client->get("search?jql=reporter=".$this->getUserByEmail($user));
-        $response = json_decode($response->getBody()->getContents(), true);
-        return $response['issues'];
+        try {
+            $response = $this->client->get("search?jql=reporter=".$this->getUserByEmail($user));
+            $response = json_decode($response->getBody()->getContents(), true);
+            return $response['issues'];
+        }
+        catch (GuzzleException $e) {
+            return [];
+        }
     }
 
     /**
@@ -44,7 +48,7 @@ class JiraService
 
     public function generateLink($key)
     {
-        return 'https://bondarkov.atlassian.net/browse/'.$key;
+        return getenv('JIRA_URL').$key;
     }
 
     public function createTicket(array $request, string $url, ?int $collection, string $user) {

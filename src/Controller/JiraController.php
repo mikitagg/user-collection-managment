@@ -60,7 +60,8 @@ class JiraController extends AbstractController
         $key = $this->jiraService->getJiraKey($response);
         $link = $this->jiraService->generateLink($key);
 
-        return new Response($response);
+        $this->addFlash('success', $link);
+        return $this->redirectToRoute('jira_issue_show');
     }
 
 }
