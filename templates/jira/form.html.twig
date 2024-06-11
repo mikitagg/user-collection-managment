@@ -1,0 +1,38 @@
+<div id="support-form-container" style="display: none;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="{{ path('jira_ticket') }}" method="post" class="p-3">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <textarea class="form-control" id="description" name="description" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="priority" class="form-label">Priority:</label>
+                    <select class="form-select" id="priority" name="priority" required>
+                        <option value="4">Low</option>
+                        <option value="3">Medium</option>
+                        <option value="2">High</option>
+                    </select>
+                </div>
+                {% if collection is defined %}
+                    <input type="hidden" class="form-control" id="collection" name="collection" value="{{ collection }}">
+                {% endif %}
+                <button type="submit" class="btn btn-primary">Create Ticket</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const openSupportFormButton = document.getElementById('open-support-form');
+    const supportFormContainer = document.getElementById('support-form-container');
+    openSupportFormButton.addEventListener('click', function() {
+        supportFormContainer.style.display = supportFormContainer.style.display === 'none' ? 'block' : 'none';
+    });
+</script>
+
+
