@@ -18,6 +18,7 @@
                         <th>summary</th>
                         <th>description</th>
                         <th>url</th>
+                        <th>issue</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -28,6 +29,7 @@
                             <td> {{ issue.fields.summary }}</td>
                             <td> {{ issue.fields.description }}</td>
                             <td> {{ issue.fields.customfield_10034 }}</td>
+                            <td> <a href="https://bondarkov.atlassian.net/browse/{{ issue.key }}">https://bondarkov.atlassian.net/browse/{{ issue.key }}</a></td>
                         </tr>
                     {% else %}
                         <tr>

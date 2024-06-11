@@ -17,6 +17,8 @@ class JiraService
             'base_uri' => getenv('BASE_URI'),
             'auth' => ['n21601201@gmail.com', getenv('AUTH_TOKEN')],
         ]);
+
+
     }
 
     public function getUserIssues($user): array

@@ -34,7 +34,8 @@ class JiraController extends AbstractController
         );
 
         return $this->render('jira/show.html.twig', [
-            'pagination' => $pagination
+            'pagination' => $pagination,
+            'issue_url' => 'https://bondarkov.atlassian.net/browse/'
         ]);
     }
 
@@ -58,6 +59,7 @@ class JiraController extends AbstractController
         $response = $this->jiraService->createTicket($request->request->all(), $url, $collection, $user);
         $key = $this->jiraService->getJiraKey($response);
         $link = $this->jiraService->generateLink($key);
+
         return new Response($response);
     }
 

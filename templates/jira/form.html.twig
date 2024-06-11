@@ -1,5 +1,5 @@
-<div id="support-form-container" style="display: none;">
-    <div class="modal-dialog modal-dialog-centered">
+<div class="modal fade" id="add-support-form" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <form action="{{ path('jira_ticket') }}" method="post" class="p-3">
                 <div class="mb-3">
@@ -26,13 +26,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    const openSupportFormButton = document.getElementById('open-support-form');
-    const supportFormContainer = document.getElementById('support-form-container');
-    openSupportFormButton.addEventListener('click', function() {
-        supportFormContainer.style.display = supportFormContainer.style.display === 'none' ? 'block' : 'none';
-    });
-</script>
-
-

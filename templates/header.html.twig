@@ -10,6 +10,7 @@
                 <li><a href="{{ path('app_collection_show_all') }}" class="nav-link px-2 link-dark">All Collections</a></li>
                 {% if app.user %}
                     <li><a href="{{ path('app_collection_show_user', { 'id' : app.user.id }) }}" class="nav-link px-2 link-dark"> Profile </a></li>
+                    <li><a href="{{ path('jira_issue_show') }}" class="nav-link px-2 link-dark"> Issues </a></li>
                 {% endif %}
             </ul>
 
@@ -21,6 +22,10 @@
                 {% if app.user %}
                     {{ app.user.userIdentifier }}
                         <a href="{{ path('app_logout') }}"><button type="button" class="btn btn-dark me-2 ms-3">Log Out</button></a>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-support-form">
+                        Help
+                    </button>
+
                 {% else %}
                     <a href="{{ path('app_login') }}"><button type="button" class="btn btn-outline-black me-2">Login</button></a>
                     <a href="{{ path('app_register') }}"><button type="button" class="btn btn-warning">Sign up</button></a>
@@ -29,4 +34,6 @@
         </div>
     </div>
 </header>
+{% include 'jira/form.html.twig' %}
+
 
